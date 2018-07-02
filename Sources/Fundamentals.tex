@@ -2,33 +2,64 @@
 \chapter{Fundamentals}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\begin{center}
-  \begin{minipage}{0.5\textwidth}
-    \begin{small}
-      In which the reasons for creating this package are laid bare for the
-      whole world to see and we encounter some usage guidelines.
-    \end{small}
-  \end{minipage}
-  \vspace{0.5cm}
-\end{center}
-
-\noindent This package contains a minimal, modern template for writing your
-thesis. While originally meant to be used for a Ph.\,D.\ thesis, you can
-equally well use it for your honour thesis, bachelor thesis, and so
-on---some adjustments may be necessary, though.
+This chapter provides a basic understanding of the underlying methods
+and concepts, that were required for this work.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Why?}
+\section{Grids}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-I was not satisfied with the available templates for \LaTeX{} and wanted
-to heed the style advice given by people such as Robert
-Bringhurst~\cite{Bringhurst12} or Edward R.\
-Tufte~\cite{Tufte90,Tufte01}. While there \emph{are} some packages out
-there that attempt to emulate these styles, I found them to be either
-too bloated, too playful, or too constraining. This template attempts to
-produce a beautiful look without having to resort to any sort of hacks.
-I hope you like it.
+In computational science, discrete data domains are often represented by
+grids. The data itself is mostly saved at specific points of the grid 
+(nodes), or in regions (cells), enclosed by surrounding nodes and the
+respective connections (edges) between them. In more rare cases the
+values are saved in the edges or the faces of the cells. The connectivity
+of the nodes is given by the topology of the grid and therefore the shape
+of the cells. There are three types of grids: scattered data, which has
+no topology, hence no edges connecting the nodes, structured grids, which
+have an implicit topology with a fixed number of nodes per dimension, as
+well as fixed cell types, and unstructured grids, which only have irregular
+topology with varying cell types. For the latter the topology has
+to be stored explicitly. Structured grids can further be distinguished
+into uniform, rectilinear and curvilinear (irregular) structured grids.
+The nodes in uniform grids are equidistant for every dimension, whereas
+rectilinear grids may have irregular spacings along either axis.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Scalarfields}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Vectorfields}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Derivatives}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Principal Component Analysis}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Matrix Decompositions}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Multivariate Gaussian Sampling}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Ridges}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Marching Ridges}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Parallel Vectors}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{How?}
