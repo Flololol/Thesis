@@ -17,17 +17,25 @@ values are saved in the edges or the faces of the cells. The connectivity
 of the nodes is given by the topology of the grid and therefore the shape
 of the cells. There are three types of grids: scattered data, which has
 no topology, hence no edges connecting the nodes, structured grids, which
-have an implicit topology with a fixed number of nodes per dimension, as
-well as fixed cell types, and unstructured grids, which only have irregular
-topology with varying cell types. For the latter the topology has
-to be stored explicitly. Structured grids can further be distinguished
-into uniform, rectilinear and curvilinear (irregular) structured grids.
-The nodes in uniform grids are equidistant for every dimension, whereas
-rectilinear grids may have irregular spacings along either axis.
+have an implicit topology following the ordering of the nodes, with a
+fixed number of nodes per dimension, as well as fixed cell types, and
+unstructured grids, which only have irregular topology with varying cell
+types. For the latter the topology has to be stored explicitly. Structured
+grids can further be distinguished into uniform, rectilinear and
+curvilinear (irregular) structured grids. The nodes in uniform grids are
+equidistant for every dimension, whereas rectilinear grids may have irregular
+spacings along either axis and curvilinear grids may have irregular spacings
+between each grid node. This work focuses on uniform structured grids as
+it makes it easier to compare multiple grids at specific points in the
+domain.
+[INSERT PICTURE TO DIFFERENT GRID TYPES]
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Scalarfields}
+\section{Scalar Fields}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+An $\eta$-dimensional field with a single scalar value at every point is
+called a scalar field.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Vectorfields}
@@ -106,12 +114,12 @@ it easier to select proper fonts.
   \caption{%
     A list of the most relevant packages required~(and automatically imported) by this template.
   }
-  \label{tab:Packages}
+\label{tab:Packages}
 \end{table}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 The template automatically imports numerous convenience packages that
-aid in your typesetting process. \autoref{tab:Packages} lists the
+aid in your typesetting process. lists the
 most important ones. Let's briefly discuss some examples below. Please
 refer to the source code for more demonstrations.
 
