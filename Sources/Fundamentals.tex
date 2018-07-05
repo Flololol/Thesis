@@ -27,22 +27,95 @@ equidistant for every dimension, whereas rectilinear grids may have irregular
 spacings along either axis and curvilinear grids may have irregular spacings
 between each grid node. This work focuses on uniform structured grids as
 it makes it easier to compare multiple grids at specific points in the
-domain.
-[INSERT PICTURE TO DIFFERENT GRID TYPES]
+domain.\\
+INSERT PICTURE TO DIFFERENT GRID TYPES
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Scalar Fields}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-An $\eta$-dimensional field with a single scalar value at every point is
-called a scalar field.
+An $n$-dimensional field with a single scalar value at every point in
+space is called a scalar field. A simple example for a scalar field is a
+height map of some geographical terrain. It has two dimensions with a
+height value at every point encoded with color. In this work we will use
+the notation $S(x)$ for the scalar value at point $x = (x_1,\dots,x_n)$
+in the scalar field $S$ with $S: \real^n \rightarrow \real$. While in
+continuous scalar fields the values of every point are defined by a
+function, discrete scalar fields only have values at specific points in
+space. As real world data is often acquired by measuring certain
+locations and usually does not follow any graspable function, we will
+focus on discrete fields in this work.\\
+INSERT PICTURE OF HEIGHT MAP
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Vectorfields}
+\subsection{Uncertain Scalar Fields}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Notation of uncertainty.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Vector Fields}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+An $n$-dimensional vector field $V$ associates an $m$-dimensional vector
+with every point in space $V(x_1,\dots,x_n):\real^n \rightarrow \real^m$.
+If the vector field is the result of deriving a scalar field, thus the 
+vector field is the gradient of the scalar field, the vector field is
+called conservative. Conservative vector fields have the property, that
+the line integral along any path connecting two points is always equal.
+Since we are extracting features from scalar fields in this work, our
+vector fields will always be conservative and $n = m$.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Tensor Fields}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+An $n$-dimensional tensor field $H$ associates an $l \times m$-dimensional
+tensor with every point in space $H(x_1,\dots,x_n): \real^n \rightarrow
+\real^{l \times m}$. Tensor fields are a generalization of scalar and
+vector fields as a tensor with $l = m = 1$ would represent a scalar, and
+with $l > 1$ and $m = 1$ a vector. In our case, the tensor field is a
+result of deriving a vector field, thus $n = l = m$.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Derivatives}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Since we are dealing with discrete scalar fields, we have no function we
+could derive to get the underlying gradient field. Instead we have to
+approximate the derivatives with finite difference methods. There are
+three forms which are commonly used:\\
+\\
+\begin{inparaenum}[(a)]
+  \item Forward Differences
+  \begin{equation}
+    \nabla S(x_i) = \frac{S(x_{i+1}) - S(x_i)}{h}
+  \end{equation}
+  \item Backward Differences
+  \begin{equation}
+    \nabla S(x_i) = \frac{S(x_i) - S(x_{i-1})}{h}
+  \end{equation}
+  \item Central Differences
+  \begin{equation}
+    \nabla S(x_i) = \frac{S(x_{i+1}) - S(x_{i-1})}{2h}
+  \end{equation}
+\end{inparaenum}
+where $S(x_i)$ denotes the $i$-th point in one dimension and $h$ the
+distance between two neighboring points. Forward and backward differences
+are used at the borders of the field, when no previous or succeeding
+point is available. As we will explain in chapter \ref{chap:Method},
+with our current implementation we process cells with a fixed size and
+therefore do not consider border cases, thus this work focuses on central
+differences.
+
+%----------------------------------------------------------------------%
+\subsection{First Derivative}
+%----------------------------------------------------------------------%
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Linear Interpolation}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -87,35 +160,6 @@ it easier to select proper fonts.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Features}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{table}
-  \centering
-  \begin{tabular}{ll}
-    \toprule
-    \textbf{Package}      & \textbf{Purpose}\\
-    \midrule
-      \texttt{amsmath}          & Basic mathematical typography\\
-      \texttt{amsthm}           & Basic mathematical environments for proofs etc.\\
-      \texttt{booktabs}         & Typographically light rules for tables\\
-      \texttt{bookmarks}        & Bookmarks in the resulting PDF\\
-      \texttt{dsfont}           & Double-stroke font for mathematical concepts\\
-      \texttt{graphicx}         & Graphics\\
-      \texttt{hyperref}         & Hyperlinks\\
-      \texttt{multirow}         & Permits table content to span multiple rows or columns\\ 
-      \texttt{paralist}         & Paragraph~(`in-line') lists and compact enumerations\\
-      \texttt{scrlayer-scrpage} & Page headings\\
-      \texttt{setspace}         & Line spacing\\
-      \texttt{siunitx}          & Proper typesetting of units\\
-      \texttt{subcaption} & Proper sub-captions for figures\\
-    \bottomrule
-  \end{tabular}
-  \caption{%
-    A list of the most relevant packages required~(and automatically imported) by this template.
-  }
-\label{tab:Packages}
-\end{table}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 The template automatically imports numerous convenience packages that
@@ -164,8 +208,11 @@ Along with the standard environments, this template offers
 %
 Here's a quick example: The American constitution speaks, among others, of
 %
-\begin{inparaenum}[(i)]
+\begin{inparaenum}[(a)]
   \item life
+  \begin{equation}
+    V = 5
+  \end{equation}
   \item liberty
   \item the pursuit of happiness.
 \end{inparaenum}
