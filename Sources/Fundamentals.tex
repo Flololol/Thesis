@@ -10,23 +10,24 @@ and concepts, that were required for this work.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 In computational science, discrete data domains are often represented by
-grids. The data itself is mostly saved at specific points of the grid 
+grids. The data itself is mostly saved at specific points of the grid
 (nodes), or in regions (cells), enclosed by surrounding nodes and the
 respective connections (edges) between them. In more rare cases the
-values are saved in the edges or the faces of the cells. The connectivity
-of the nodes is given by the topology of the grid and therefore the shape
-of the cells. There are three types of grids: scattered data, which has
-no topology, hence no edges connecting the nodes, structured grids, which
-have an implicit topology following the ordering of the nodes, with a
-fixed number of nodes per dimension, as well as fixed cell types, and
-unstructured grids, which only have irregular topology with varying cell
-types. For the latter the topology has to be stored explicitly. Structured
-grids can further be distinguished into uniform, rectilinear and
-curvilinear (irregular) structured grids. The nodes in uniform grids are
-equidistant for every dimension, whereas rectilinear grids may have irregular
-spacings along either axis and curvilinear grids may have irregular spacings
-between each grid node. This work focuses on uniform structured grids as
-it makes it easier to compare multiple grids at specific points in the
+values are saved in the edges or the faces of the cells. The
+connectivity of the nodes is given by the topology of the grid and
+therefore the shape of the cells. There are three types of grids:
+scattered data, which has no topology, hence no edges connecting the
+nodes, structured grids, which have an implicit topology following the
+ordering of the nodes, with a fixed number of nodes per dimension, as
+well as fixed cell types, and unstructured grids, which only have
+irregular topology with varying cell types. For the latter the topology
+has to be stored explicitly. Structured grids can further be
+distinguished into uniform, rectilinear and curvilinear (irregular)
+structured grids. The nodes in uniform grids are equidistant for every
+dimension, whereas rectilinear grids may have irregular spacings along
+either axis and curvilinear grids may have irregular spacings between
+each grid node. This work focuses on uniform structured grids as it
+makes it easier to compare multiple grids at specific points in the
 domain.\\
 INSERT PICTURE TO DIFFERENT GRID TYPES
 
@@ -44,14 +45,16 @@ continuous scalar fields the values of every point are defined by a
 function, discrete scalar fields only have values at specific points in
 space. As real world data is often acquired by measuring certain
 locations and usually does not follow any graspable function, we will
-focus on discrete fields in this work.\\
+focus on discrete scalar fields in this work. This also applies to the
+other types of fields we will encounter, because they have the same 
+resolution as the scalar field.\\
 INSERT PICTURE OF HEIGHT MAP
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Uncertain Scalar Fields}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Notation of uncertainty.
+Notation of uncertainty. Read Paper!
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Vector Fields}
@@ -70,12 +73,13 @@ vector fields will always be conservative and $n = m$.
 \section{Tensor Fields}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-An $n$-dimensional tensor field $H$ associates an $l \times m$-dimensional
-tensor with every point in space $H(x_1,\dots,x_n): \real^n \rightarrow
-\real^{l \times m}$. Tensor fields are a generalization of scalar and
-vector fields as a tensor with $l = m = 1$ would represent a scalar, and
-with $l > 1$ and $m = 1$ a vector. In our case, the tensor field is a
-result of deriving a vector field, thus $n = l = m$.
+An $n$-dimensional tensor field $H$ associates an $l \times
+m$-dimensional tensor with every point in space $H(x_1,\dots,x_n):
+\real^n \rightarrow \real^{l \times m}$. Tensor fields are a
+generalization of scalar and vector fields as a tensor with $l = m = 1$
+would represent a scalar, and with $l > 1$ and $m = 1$ a vector. In our
+case, the tensor field is a result of deriving a vector field, thus $n =
+l = m$.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Derivatives}
@@ -89,21 +93,21 @@ three forms which are commonly used:\\
 \begin{inparaenum}[(a)]
   \item Forward Differences
   \begin{equation}
-    \nabla S(x_i) = \frac{S(x_{i+1}) - S(x_i)}{h}
+    \nabla f(x_i) = \frac{f(x_{i+1}) - f(x_i)}{h}
   \end{equation}
   \item Backward Differences
   \begin{equation}
-    \nabla S(x_i) = \frac{S(x_i) - S(x_{i-1})}{h}
+    \nabla f(x_i) = \frac{f(x_i) - f(x_{i-1})}{h}
   \end{equation}
   \item Central Differences
-  \begin{equation}
-    \nabla S(x_i) = \frac{S(x_{i+1}) - S(x_{i-1})}{2h}
+  \begin{equation} \label{eq:centDiff}
+    \nabla f(x_i) = \frac{f(x_{i+1}) - f(x_{i-1})}{2h}
   \end{equation}
 \end{inparaenum}
-where $S(x_i)$ denotes the $i$-th point in one dimension and $h$ the
-distance between two neighboring points. Forward and backward differences
-are used at the borders of the field, when no previous or succeeding
-point is available. As we will explain in chapter \ref{chap:Method},
+where $f(x_i)$ denotes the $i$-th point of the function $f(x): \real \rightarrow \real$
+and $h$ the distance between two neighboring points. Forward and backward
+differences are used at the borders of the field, where no previous or
+succeeding point is available. As we will explain in Chapter~\ref{chap:Method},
 with our current implementation we process cells with a fixed size and
 therefore do not consider border cases, thus this work focuses on central
 differences.
@@ -112,22 +116,102 @@ differences.
 \subsection{First Derivative}
 %----------------------------------------------------------------------%
 
+When deriving an $n$-dimensional scalar field $S$, we need to apply
+Equation~\ref{eq:centDiff} for every dimension. This results in $n$
+scalar values, representing the change of the scalar field in the
+respective dimensions. These values can be interpreted as an
+$n$-dimensional vector, pointing in the direction of greatest ascend for
+every point of the scalar field. This is the gradient field $\nabla
+S(x)$.
 
+%----------------------------------------------------------------------%
+\subsection{Second Derivative}
+%----------------------------------------------------------------------%
+
+The second derivative of an $n$-dimensional scalar field is an $n$
+-dimensional tensor field with $\nabla^2 S:\real^n \rightarrow \real^{n \times n}$.
+This tensor field can again be obtained with the central difference
+method applied to every dimension of the gradient field. Here we get an
+$n$-dimensional vector per dimension as we are subtracting the previous
+gradient from the succeeding gradient of point $x$ along any dimension.
+These vectors represent the respective columns of the so called Hessian
+matrix. The Hessian matrix $H$ is a specification of the Jacobian Matrix $J$,
+which derives any vector valued function $f(x): \real^n \rightarrow \real^m$,
+$J \in \real^{m \times n}$. The Hessian matrix is obtained when deriving
+a conservative vector field, therefore the Hessian is quadratic with:
+
+\begin{equation}
+  H =
+  \begin{bmatrix}
+    \frac{\partial^2 S}{\partial x_1^2} & \frac{\partial^2 S}{\partial x_1 \partial x_2} & \dots & \frac{\partial^2 S}{\partial x_1 \partial x_n}\\
+    \frac{\partial^2 S}{\partial x_2 \partial x_1} & \frac{\partial^2 S}{\partial x_2^2} & \dots & \frac{\partial^2 S}{\partial x_2 \partial x_n}\\
+    \vdots & \vdots & \ddots & \vdots \\
+    \frac{\partial^2 S}{\partial x_n \partial x_1} & \frac{\partial^2 S}{\partial x_n \partial x_2} & \dots & \frac{\partial^2 S}{\partial x_n^2}
+  \end{bmatrix}
+  \in \real^{n \times n}
+\end{equation}
+
+\noindent According to Schwarz's theorem of the symmetry of second
+derivatives ([ref]), the Hessian is assumed to be symmetric, therefore
+the eigenvectors are orthogonal and the eigenvalues are real valued.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Linear Interpolation}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Principal Component Analysis}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Our discrete fields only provide information for a limited number of
+points along a dimension, therefore we need to estimate the values lying
+between the known locations. To ease computation we assume that the
+underlying functions of the fields are linear and apply linear
+interpolation to the tensors $A, B \in \real^{n \times n}$ at the
+neighboring points, independent of dimensionality. As we will explain in
+Chapter~\ref{chap:Method}, we only apply interpolation on the edges of
+cells and can therefore assume the distance between the two nodes to be
+$1$. This leads to the interpolated tensor:
+
+\begin{equation}
+  T_{ipol} =
+  \begin{bmatrix}
+    (1-t) \cdot A_{11} + t \cdot B_{11} & \dots & (1-t) \cdot A_{1n} + t \cdot B_{1n} \\
+    \vdots & \ddots & \vdots \\
+    (1-t) \cdot A_{n1} + t \cdot B_{n1} & \dots & (1-t) \cdot A_{nn} + t \cdot B_{nn} \\
+  \end{bmatrix}
+  \in \real^{n \times n}
+\end{equation}
+with $t$ being the relative distance of the desired location to tensor
+$A$. (see Figure ipol) We will only consider the cases for $n \in
+\{1,2,3\}$. \\
+(Picture explaining linear interpolation)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Matrix Decompositions}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+A matrix decomposition is a factorization of a matrix into its
+constituent parts. In general there are two classes of factorizations:
+decompositions used for solving linear equations and decompositions
+based on eigenvalues and vectors. We will consider one example from each
+class, namely the Cholesky and the Eigendecomposition. As we will
+explain in Section~\ref{sec:MGS} we will use both decompositions to
+generate samples from a multivariate gaussian distribution, even though
+they are from different classes.
+
+%----------------------------------------------------------------------%
+\subsection{Cholesky Decomposition}
+%----------------------------------------------------------------------%
+
+
+
+%----------------------------------------------------------------------%
+\subsection{Eigendecomposition}
+%----------------------------------------------------------------------%
+
+%----------------------------------------------------------------------%
+\subsubsection{Principal Component Analysis}
+%----------------------------------------------------------------------%
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Multivariate Gaussian Sampling}
+\section{Multivariate Gaussian Sampling} \label{sec:MGS}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -141,100 +225,3 @@ differences.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Parallel Vectors}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{How?}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-The package tries to be easy to use. If you are satisfied with the
-default settings, just add
-%
-\begin{verbatim}
-\documentclass{mimosis}
-\end{verbatim}
-%
-at the beginning of your document. This is sufficient to use the class.
-It is possible to build your document using either \LaTeX|, \XeLaTeX, or
-\LuaLaTeX. I personally prefer one of the latter two because they make
-it easier to select proper fonts.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Features}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-The template automatically imports numerous convenience packages that
-aid in your typesetting process. lists the
-most important ones. Let's briefly discuss some examples below. Please
-refer to the source code for more demonstrations.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Typesetting mathematics}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-This template uses \verb|amsmath| and \verb|amssymb|, which are the
-de-facto standard for typesetting mathematics. Use numbered equations
-using the \verb|equation| environment.
-%
-If you want to show multiple equations and align them, use the
-\verb|align| environment:
-%
-\begin{align}
-    V &:= \{ 1, 2, \dots \}\\
-    E &:= \big\{ \left(u,v\right) \mid \dist\left(p_u, p_v\right) \leq \epsilon \big\}
-\end{align}
-%
-Define new mathematical operators using \verb|\DeclareMathOperator|.
-Some operators are already pre-defined by the template, such as the
-distance between two objects. Please see the template for some examples. 
-%
-Moreover, this template contains a correct differential operator. Use \verb|\diff| to typeset the differential of integrals:
-%
-\begin{equation}
-  f(u) := \int_{v \in \domain}\dist(u,v)\diff{v}
-\end{equation}
-%
-You can see that, as a courtesy towards most mathematicians, this
-template gives you the possibility to refer to the real numbers~$\real$
-and the domain~$\domain$ of some function. Take a look at the source for
-more examples. By the way, the template comes with spacing fixes for the
-automated placement of brackets.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Typesetting text}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-Along with the standard environments, this template offers
-\verb|paralist| for lists within paragraphs.
-%
-Here's a quick example: The American constitution speaks, among others, of
-%
-\begin{inparaenum}[(a)]
-  \item life
-  \begin{equation}
-    V = 5
-  \end{equation}
-  \item liberty
-  \item the pursuit of happiness.
-\end{inparaenum}
-%
-These should be added in equal measure to your own conduct. To typeset
-units correctly, use the \verb|siunitx| package. For example, you might
-want to restrict your daily intake of liberty to \SI{750}{\milli\gram}.
-
-Likewise, as a small pet peeve of mine, I offer specific operators for \emph{ordinals}. Use \verb|\th| to typeset things like July~4\th correctly. Or, if you are referring to the 2\nd edition of a book, please use \verb|\nd|. Likewise, if you came in 3\rd in a marathon, use \verb|\rd|. This is my 1\st rule.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Changing things}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-Since this class heavily relies on the \verb|scrbook| class, you can use
-\emph{their} styling commands in order to change the look of things. For
-example, if you want to change the text in sections to \textbf{bold} you
-can just use
-%
-\begin{verbatim}
-  \setkomafont{sectioning}{\normalfont\bfseries}
-\end{verbatim}
-%
-at the end of the document preamble---you don't have to modify the class
-file for this. Please consult the source code for more information.
