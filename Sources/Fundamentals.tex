@@ -100,17 +100,17 @@ three forms which are commonly used:\\
     \nabla f(x_i) = \frac{f(x_i) - f(x_{i-1})}{h}
   \end{equation}
   \item Central Differences
-  \begin{equation} \label{eq:centDiff}
+  \begin{equation}\label{eq:centDiff}
     \nabla f(x_i) = \frac{f(x_{i+1}) - f(x_{i-1})}{2h}
   \end{equation}
 \end{inparaenum}
-where $f(x_i)$ denotes the $i$-th point of the function $f(x): \real \rightarrow \real$
-and $h$ the distance between two neighboring points. Forward and backward
-differences are used at the borders of the field, where no previous or
-succeeding point is available. As we will explain in Chapter~\ref{chap:Method},
-with our current implementation we process cells with a fixed size and
-therefore do not consider border cases, thus this work focuses on central
-differences.
+where $f(x_i)$ denotes the $i$-th point of the function $f(x): \real
+\rightarrow \real$ and $h$ the distance between two neighboring points.
+Forward and backward differences are used at the borders of the field,
+where no previous or succeeding point is available. As we will explain
+in Chapter~\ref{chap:Method}, with our current implementation we process
+cells with a fixed size and therefore do not consider border cases, thus
+this work focuses on central differences.
 
 %----------------------------------------------------------------------%
 \subsection{First Derivative}
@@ -129,16 +129,17 @@ S(x)$.
 %----------------------------------------------------------------------%
 
 The second derivative of an $n$-dimensional scalar field is an $n$
--dimensional tensor field with $\nabla^2 S:\real^n \rightarrow \real^{n \times n}$.
-This tensor field can again be obtained with the central difference
-method applied to every dimension of the gradient field. Here we get an
-$n$-dimensional vector per dimension as we are subtracting the previous
-gradient from the succeeding gradient of point $x$ along any dimension.
-These vectors represent the respective columns of the so called Hessian
-matrix. The Hessian matrix $H$ is a specification of the Jacobian Matrix $J$,
-which derives any vector valued function $f(x): \real^n \rightarrow \real^m$,
-$J \in \real^{m \times n}$. The Hessian matrix is obtained when deriving
-a conservative vector field, therefore the Hessian is quadratic with:
+-dimensional tensor field with $\nabla^2 S:\real^n \rightarrow \real^{n
+\times n}$. This tensor field can again be obtained with the central
+difference method applied to every dimension of the gradient field. Here
+we get an $n$-dimensional vector per dimension as we are subtracting the
+previous gradient from the succeeding gradient of point $x$ along any
+dimension. These vectors represent the respective columns of the so
+called Hessian matrix. The Hessian matrix $H$ is a specification of the
+Jacobian Matrix $J$, which derives any vector valued function $f(x):
+\real^n \rightarrow \real^m$, $J \in \real^{m \times n}$. The Hessian
+matrix is obtained when deriving a conservative vector field, therefore
+the Hessian is quadratic with:
 
 \begin{equation}
   H =
@@ -200,18 +201,172 @@ they are from different classes.
 \subsection{Cholesky Decomposition}
 %----------------------------------------------------------------------%
 
+The Cholesky factorization is a decomposition of a square, hermititan,
+positive definite matrix $A$ into the product of a lower-triangular
+matrix L and its conjugate transpose $A = L L^*$. A matrix $C$ is
+hermitian if the diagonal elements are real valued and $C_{ij} =
+\overline{C_{ji}}$, meaning that $\overline{C_{ji}}$ is the complex
+conjugate of $C_{ij}$. Two complex numbers are complex conjugate if they
+have equal real and imaginary parts, but opposite signs. For example,
+$1+i$ is the complex conjugate of $1-i$. Following this property, the
+standard Cholesky decomposition is also applicable for every real
+valued, symmetric, positive definite matrix, resulting in a lower
+triangular real valued matrix and its transpose $A = L L^\top$. We
+will only deal with real valued matrices in this work and therefore
+follow this notation. A simple way to determine the definiteness of a
+matrix is to look at its eigenvalues. If every eigenvalue $\lambda$ of a
+square $n \times n$ matrix is greater than zero, $\lambda_{i} > 0, i \in
+\{1,\dots,n\}$, the matrix is positive definite. If every eigenvalue is
+greater or equal to zero, $\lambda_{i} \ge 0$, the matrix is positive
+semi-definite. The same goes for negative eigenvalues, as they make the
+matrix negative (semi-) definite.
 
+%----------------------------------------------------------------------%
+\subsubsection{$LDL^T$ Decomposition}
+%----------------------------------------------------------------------%
+
+The closely related $LDL^T$ decomposition extends the classical Cholesky
+decomposition to semi-definite and negative definite matrices $A = L D
+L^\top$, where $L$ is a lower unitriangular matrix, meaning there are
+only ones on the diagonal, and $D$ is a diagonal matrix. The two
+decompositions are related as follows:
+
+\begin{equation}
+  A = LDL^\top = (L D^\frac{1}{2}) (D^\frac{1}{2}  L^\top)
+\end{equation}
+
+\noindent This version has the advantage that it avoids extracting
+square roots, thus allowing for negative entries in $D$, as it is
+possible for some indefinite matrices for which no classical
+decomposition exists, while having the same computational complexity as
+the Cholesky decomposition. If the solution of a linear system is needed
+and the system can be put into a symmetric form, the Cholesky
+decomposition and its variant is the method of choice, as it offers
+efficiency and usually numerical stability. Here is an example for both
+variants of the decomposition:\\
+\begin{inparaenum}[]
+  \item Cholesky decomposition of a symmetric real valued matrix
+  \begin{equation}
+    \begin{pmatrix}
+      9 & 18 & -27\\
+      18 & 40 & -18 \\
+      -27 & -18 & 406
+    \end{pmatrix}
+    =
+    \begin{pmatrix}
+      3 & 0 & 0\\
+      6 & 2 & 0 \\
+      -9 & 18 & 1
+    \end{pmatrix}
+    \begin{pmatrix}
+      3 & 6 & -9\\
+      0 & 2 & 18 \\
+      0 & 0 & 1
+    \end{pmatrix}
+  \end{equation}
+  \item $LDL^T$ decomposition of the same matrix
+  \begin{equation}
+    \begin{pmatrix}
+      9 & 18 & -27\\
+      18 & 40 & -18 \\
+      -27 & -18 & 406
+    \end{pmatrix}
+    =
+    \begin{pmatrix}
+      1 & 0 & 0\\
+      2 & 1 & 0 \\
+      -3 & 9 & 1
+    \end{pmatrix}
+    \begin{pmatrix}
+      9 & 0 & 0\\
+      0 & 4 & 0 \\
+      0 & 0 & 1
+    \end{pmatrix}
+    \begin{pmatrix}
+      1 & 2 & -3\\
+      0 & 1 & 9 \\
+      0 & 0 & 1
+    \end{pmatrix}
+  \end{equation}
+\end{inparaenum}
 
 %----------------------------------------------------------------------%
 \subsection{Eigendecomposition}
 %----------------------------------------------------------------------%
 
+The Eigendecomposition is a factorization of a square $n \times n$,
+diagonizable matrix $A$, into the form $A = E \Lambda E^{-1}$, where the
+columns of $E$ are $n$ linearly independent eigenvectors of $A$ and
+$\Lambda$ is a diagonal matrix with the respective eigenvalues. The
+eigenvalue $\lambda_i$ at $\Lambda_{ii}$ corresponds to the eigenvector
+$\epsilon_i$ at column $i, i \in \{1,\dots,n\}$ of $E$. This follows the
+basic attribute of eigenvectors, as they only change by a scalar factor
+when multiplied with their respective matrix, meaning $A \epsilon =
+\lambda \epsilon$ and therefore $A E = E \Lambda$, which leads to the
+decomposition $A = E \Lambda E^{-1}$. Heres a simple example of the
+Eigendecomposition of a symmetric, real, diagonizable matrix:
+
+\begin{equation}
+  \begin{pmatrix}
+    1 & {-3} & 3\\
+    3 & {-5} & 3\\
+    6 & {-6} & 4
+  \end{pmatrix}
+  =
+  \begin{pmatrix}
+    1 & {-1} & 1\\
+    1 & 0 & 1\\
+    2 & 1 & 0
+  \end{pmatrix}
+  \begin{pmatrix}
+    4 & 0 & 0\\
+    0 & {-2} & 0\\
+    0 & 0 & {-2}
+  \end{pmatrix}
+  \begin{pmatrix}
+    0.5 & {-0.5} & 0.5\\
+    {-1} & 1 & 0\\
+    {-0.5} & 1.5 & {-0.5}
+  \end{pmatrix}
+\end{equation}
+
+An $n \times n$-dimensional matrix is diagonizable if it has $n$
+linearly independent eigenvectors. The decomposition can for example be
+used to easily raise a matrix to a power, as you only have to raise the
+eigenvalue matrix $\Lambda$ to that power:
+
+\begin{equation}
+  \begin{pmatrix}
+    1 & {-3} & 3\\
+    3 & {-5} & 3\\
+    6 & {-6} & 4
+  \end{pmatrix}
+  ^4
+  =
+  E
+  \Lambda^4
+  E^{-1}
+  =
+  \begin{pmatrix}
+    136 & {-120} & 120\\
+    120 & {-104} & 120\\
+    240 & {-240} & 256
+  \end{pmatrix}
+\end{equation}
+
+In this work, our matrices don't need to be diagonizable, as this
+property is only required for the inverse of the eigenvector matrix.
+Section~\ref{sec:MGS} will give more information on that matter. 
+
 %----------------------------------------------------------------------%
 \subsubsection{Principal Component Analysis}
 %----------------------------------------------------------------------%
 
+Even though the Principal Component Analysis (PCA) is not a decomposition
+in itself, it is an application of the Eigendecomposition.
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Multivariate Gaussian Sampling} \label{sec:MGS}
+\section{Multivariate Gaussian Sampling}\label{sec:MGS}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
