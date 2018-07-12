@@ -45,16 +45,50 @@ continuous scalar fields the values of every point are defined by a
 function, discrete scalar fields only have values at specific points in
 space. As real world data is often acquired by measuring certain
 locations and usually does not follow any graspable function, we will
-focus on discrete scalar fields in this work. This also applies to the
-other types of fields we will encounter, because they have the same 
-resolution as the scalar field.\\
+focus on discrete scalar fields in this work, where $n \in \{2,3\}$.
+This also applies to the other types of fields we will encounter,
+because they have the same resolution as the scalar field.\\
 INSERT PICTURE OF HEIGHT MAP
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Uncertain Scalar Fields}
+\subsection{Uncertain Scalar Fields}\label{sec:USF}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Notation of uncertainty. Read Paper!
+Unlike certain scalar fields, uncertain scalar fields have multiple
+values for every point of the domain. Following the work of Theisel
+\etal{\cite{Vortex}}, we assume that these values are Gaussian
+distributed over the $m$ members of the data ensemble obtained from
+simulations or measurements and therefore
+
+\begin{equation}
+  S_{unc}(x) = \mathcal{N}(\mu_{x}, \sigma_{x}^2),
+\end{equation}
+
+\noindent where $\mu_x$ is the mean scalar value and $\sigma_{x}^2$ the
+variance of the $m$ entities at point $x = (x_1,\dots,x_n)$. As they
+also pointed out in their work, we need to consider the neighborhood of
+$x$, so that the derivatives of the uncertain scalar field are Gaussian
+distributed as well. As we will explain in Chapter~\ref{chap:Method}, we
+will search for ridges (Section~\ref{sec:Ridges}) inside cells.
+Therefore, combining this with the need for neighboring points, we have
+4 (or 8 in the 3D case) nodes of the cell we want to observe, together
+with their neighboring points in every dimension and, because we also
+want to calculate the second derivative, their neighboring nodes as
+well. Cleared from redundant points, this results in 24 (80) nodes per
+neighborhood as illustrated in Figure (insert ref). We can take this
+neighborhood as a vector $v_x$ and calculate the $24$-dimensional mean
+vector at point $x$ of the mean vector field $m(x) = \frac{1}{m}
+\sum_{k=1}^m v_{x,k}$, followed by the $24 \times 24$-dimensional
+covariance matrix, with the covariance field being $C(x)= \frac{1}{m}
+\sum_{k=1}^m (v_{x,k} - m(x)){(v_{x,k} - m{(x)})}^\top$. Therefore our
+uncertain scalar fields follows a multivariate Gaussian distribution
+at every location
+
+\begin{equation}
+  S_{unc}(x) = \mathcal{N}(m(x), C(x)).\\
+\end{equation}
+
+(Picture explaining neighborhood)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Vector Fields}
@@ -363,14 +397,38 @@ Section~\ref{sec:MGS} will give more information on that matter.
 %----------------------------------------------------------------------%
 
 Even though the Principal Component Analysis (PCA) is not a decomposition
-in itself, it is an application of the Eigendecomposition.
+in itself, it is an application of the Eigendecomposition. In general,
+the PCA fits an $n$-dimensional ellipsoid around a set of possibly
+correlated points. The first principle component then corresponds to the
+axis of biggest magnitude of the ellipsoid and therefore the axis of the
+largest variance of the data. The principal components are always
+orthogonal to each other. When the Eigendecomposition is applied to
+a matrix containing correlated points, the resulting eigenvectors match
+the principal components, and the eigenvalues the variance along those
+axes.
+\\(PCA PICTURE)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Multivariate Gaussian Sampling}\label{sec:MGS}
+\section{Box-Muller Transformation}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+The Box-Muller Transformation is a method to transform two uniformly
+distributed random numbers into two independent, standard, normally
+distributed random numbers. Let $U_1$ and $U_2$ be samples from the
+uniform distribution on the interval ($0$, $1$). Let $N_1$ and $N_2$ be:
+
+\begin{align}
+  N_1 = \sqrt{-2 \ln{U_1}} \cos (2 \pi U_2) \\
+  N_2 = \sqrt{-2 \ln{U_1}} \sin (2 \pi U_2)
+\end{align}
+
+\noindent Then $N_1$ and $N_2$ are independent random numbers with a
+standard normal distribution, meaning that their mean is $\mu = 0$ and
+standard deviation $\sigma = 1$. This transformation can be repeated to
+generate standard normal distributed vectors of arbitrary length.
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Ridges}
+\section{Ridges}\label{sec:Ridges}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

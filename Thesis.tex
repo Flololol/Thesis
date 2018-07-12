@@ -67,8 +67,9 @@
 % Fonts
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\ifxetexorluatex
+\ifxetexorluatex{
   \setmainfont{Minion Pro}
+}
 \else
   \usepackage[lf]{ebgaramond}
   \usepackage[oldstyle,scale=0.7]{sourcecodepro}
@@ -76,6 +77,9 @@
 \fi
 
 \renewcommand{\th}{\textsuperscript{\textup{th}}\xspace}
+\newcommand{\etal}{\textit{et al}.}
+\newcommand{\ie}{\textit{i}.\textit{e}.}
+\newcommand{\eg}{\textit{e}.\textit{g}.}
 
 %\newacronym[description={Principal component analysis}]{PCA}{PCA}{principal component analysis}
 %\newacronym                                            {SNF}{SNF}{Smith normal form}
@@ -88,7 +92,7 @@
 }
 
 \makeindex
-\makeglossaries
+\makeglossaries{}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Incipit
@@ -100,28 +104,25 @@
 
 \begin{document}
 
-\frontmatter
+\frontmatter{
   \include{Sources/Title}
   \include{Sources/Abstract}
   \include{Sources/Zusammenfassung}
-
-  \tableofcontents
-
-\mainmatter
-
+  \tableofcontents{}
+}
+\mainmatter{
   \include{Sources/Introduction}
   \include{Sources/RelatedWork}
   \include{Sources/Fundamentals}
   \include{Sources/Method}
   \include{Sources/Evaluation}
-
+}
 % This ensures that the subsequent sections are being included as root
 % items in the bookmark structure of your PDF reader.
 \bookmarksetup{startatroot}
-\backmatter
-
+\backmatter{
   \printindex
-  \printglossary
-  \printbibliography
-
+  \printglossary{}
+  \printbibliography{}
+}
 \end{document}
