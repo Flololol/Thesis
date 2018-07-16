@@ -16,20 +16,57 @@ respective connections (edges) between them. In more rare cases the
 values are saved in the edges or the faces of the cells. The
 connectivity of the nodes is given by the topology of the grid and
 therefore the shape of the cells. There are three types of grids:
-scattered data, which has no topology, hence no edges connecting the
-nodes, structured grids, which have an implicit topology following the
-ordering of the nodes, with a fixed number of nodes per dimension, as
-well as fixed cell types, and unstructured grids, which only have
+scattered data (Figure~\ref{fig:scattered}), which has no topology,
+hence no edges connecting the nodes, structured grids, which have an
+implicit topology following the ordering of the nodes, with a fixed
+number of nodes per dimension, as well as fixed cell types, and
+unstructured grids (Figure~\ref{fig:unstructured}), which only have
 irregular topology with varying cell types. For the latter the topology
 has to be stored explicitly. Structured grids can further be
-distinguished into uniform, rectilinear and curvilinear (irregular)
-structured grids. The nodes in uniform grids are equidistant for every
-dimension, whereas rectilinear grids may have irregular spacings along
-either axis and curvilinear grids may have irregular spacings between
-each grid node. This work focuses on uniform structured grids as it
-makes it easier to compare multiple grids at specific points in the
-domain.\\
-INSERT PICTURE TO DIFFERENT GRID TYPES
+distinguished into uniform (Figure~\ref{fig:uniform}), rectilinear
+(Figure~\ref{fig:rectilinear}) and curvilinear structured grids
+(Figure~\ref{fig:curvilinear}). The nodes in uniform grids are
+equidistant for every dimension, whereas rectilinear grids may have
+irregular spacings along either axis and curvilinear grids may have
+irregular spacings between each grid node. This work focuses on uniform
+structured grids as it makes it easier to compare multiple grids at
+specific points in the domain.
+
+\begin{figure}
+  \begin{subfigure}[b]{0.19\textwidth}
+    \includegraphics[clip=true, width=\textwidth]{Images/Scattered.pdf}
+    \caption{scattered}
+    \label{fig:scattered}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.2\textwidth}
+    \includegraphics[clip=true, width=\textwidth]{Images/Unstructured.pdf}
+    \caption{unstructured}
+    \label{fig:unstructured}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.2\textwidth}
+    \includegraphics[clip=true, width=\textwidth]{Images/Uniform.pdf}
+    \caption{uniform}
+    \label{fig:uniform}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.2\textwidth}
+    \includegraphics[clip=true, width=\textwidth]{Images/Rectilinear.pdf}
+    \caption{rectilinear}
+    \label{fig:rectilinear}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.19\textwidth}
+    \includegraphics[clip=true, width=\textwidth]{Images/Curvilinear.pdf}
+    \caption{curvilinear}
+    \label{fig:curvilinear}
+  \end{subfigure}
+  
+  \caption{Different types of grids. Uniform structured grids like in
+  Figure~\ref{fig:uniform} can have varying distances inbetween
+  dimensions, but along a dimension, the distances of the nodes are
+  equal. Figure~\ref{fig:uniform}, \ref{fig:rectilinear} and
+  \ref{fig:curvilinear} are variants of structured grids and therefore
+  their connectivity is given by the ordering of the nodes.}
+  \label{fig:grids}
+\end{figure}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Scalar Fields}
@@ -61,7 +98,7 @@ distributed over the $m$ members of the data ensemble obtained from
 simulations or measurements and therefore
 
 \begin{equation}
-  S_{unc}(x) = \mathcal{N}(\mu_{x}, \sigma_{x}^2),
+  S_{\mathcal{N}}(x) = \mathcal{N}(\mu_{x}, \sigma_{x}^2),
 \end{equation}
 
 \noindent where $\mu_x$ is the mean scalar value and $\sigma_{x}^2$ the
@@ -85,7 +122,7 @@ uncertain scalar fields follows a multivariate Gaussian distribution
 at every location
 
 \begin{equation}
-  S_{unc}(x) = \mathcal{N}(m(x), C(x)).\\
+  S_{\mathcal{N}}(x) = \mathcal{N}(m(x), C(x)).\\
 \end{equation}
 
 (Picture explaining neighborhood)
@@ -405,8 +442,19 @@ largest variance of the data. The principal components are always
 orthogonal to each other. When the Eigendecomposition is applied to
 a matrix containing correlated points, the resulting eigenvectors match
 the principal components, and the eigenvalues the variance along those
-axes.
-\\(PCA PICTURE)
+axes. See Figure~\ref{fig:PCA} for a graphical example.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.75\textwidth]{Images/PCA.pdf}
+  \caption{Principal Component Analysis of a set of points in
+  $2$-dimensional space. The green line denotes the line of greatest
+  variance, whereas the blue line is orthogonal to the green one and
+  goes along the least variance. These lines correspond to the
+  eigenvectors of a matrix containing the $x$ and $y$ coordinates of the
+  points as columns.}
+  \label{fig:PCA}
+\end{figure}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Box-Muller Transformation}
@@ -419,7 +467,7 @@ uniform distribution on the interval ($0$, $1$). Let $N_1$ and $N_2$ be:
 
 \begin{align}
   N_1 = \sqrt{-2 \ln{U_1}} \cos (2 \pi U_2) \\
-  N_2 = \sqrt{-2 \ln{U_1}} \sin (2 \pi U_2)
+  N_2 = \sqrt{-2 \ln{U_1}} \sin (2 \pi U_2).
 \end{align}
 
 \noindent Then $N_1$ and $N_2$ are independent random numbers with a
@@ -431,8 +479,32 @@ generate standard normal distributed vectors of arbitrary length.
 \section{Ridges}\label{sec:Ridges}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+While the intuitive definition of a ridge would be a path along the
+crest of a mountain with terrain falling off on either side, we focus on
+a mathematical definition of ridges. In principal, a ridge is a local
+maximum of an $n$-dimensional function. The maximum of the
+$1$-dimensional function $f(x) = -x^2$ would be the $0$-dimensional
+point at $x=0$, the ridge point (INSERT REF). When we add a dimension,
+the domain becomes a $2$-dimensional surface, and the ridge point
+expands into a $1$-dimensional ridge line (INSERT REF). Adding another
+dimension turns the function domain into a $3$-dimensional volume and
+the ridge into a $2$-dimensional surface (INSERT REF). In general, the
+ridge is an $n-k$-dimensional manifold in an $n$-dimensional space for
+$k=\{1, \dots, n\}$. This means that ridge points and lines also exist
+in $3$-dimensional domains for example. This work focuses on ridges in
+$2$ and $3$-dimensional domains.\\
+To calculate the maximum, we need to derive the function and search for
+the points where the derived function is $0$. The derived function
+$f'(x)=-2x$ has only one zero at $x=0$. Now we only know that we have
+found an extremum and need to check whether its a maximum or minimum by
+looking at the second derivative $f''(x)=-2$. As $-2 < 0$, we now know
+that the extremum is a maximum. The same principal is applicable for
+ridges in higher dimensions. Here the first derivative, the gradient,
+. As described by
+Eberly~\cite{Eberly} and Lindeberg~\cite{Lindeberg}.
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Marching Ridges}
+\section{Marching Ridges (Cubes?)}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
