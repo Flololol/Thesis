@@ -84,8 +84,8 @@ space. As real world data is often acquired by measuring certain
 locations and usually does not follow any graspable function, we will
 focus on discrete scalar fields in this work, where $n \in \{2,3\}$.
 This also applies to the other types of fields we will encounter,
-because they have the same resolution as the scalar field.\\
-INSERT PICTURE OF HEIGHT MAP
+because they have the same resolution as the scalar field.
+\\(INSERT PICTURE OF HEIGHT MAP)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Uncertain Scalar Fields}\label{sec:USF}
@@ -220,12 +220,16 @@ the Hessian is quadratic with:
     \vdots & \vdots & \ddots & \vdots \\
     \frac{\partial^2 S}{\partial x_n \partial x_1} & \frac{\partial^2 S}{\partial x_n \partial x_2} & \dots & \frac{\partial^2 S}{\partial x_n^2}
   \end{bmatrix}
-  \in \real^{n \times n}
+  \in \real^{n \times n}.
 \end{equation}
 
 \noindent According to Schwarz's theorem of the symmetry of second
 derivatives ([ref]), the Hessian is assumed to be symmetric, therefore
-the eigenvectors are orthogonal and the eigenvalues are real valued.
+the eigenvectors are orthogonal and the eigenvalues are real valued. The
+eigenvalues of the Hessian denote the second directional derivative of
+the scalar field along the direction of the corresponding eigenvector,
+and thus the change of the gradient in the direction of the eigenvector.
+\\(EXAMPLE?!)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Linear Interpolation}
@@ -303,7 +307,7 @@ only ones on the diagonal, and $D$ is a diagonal matrix. The two
 decompositions are related as follows:
 
 \begin{equation}
-  A = LDL^\top = (L D^\frac{1}{2}) (D^\frac{1}{2}  L^\top)
+  A = LDL^\top = (L D^\frac{1}{2}) (D^\frac{1}{2}  L^\top).
 \end{equation}
 
 \noindent This version has the advantage that it avoids extracting
@@ -358,6 +362,7 @@ variants of the decomposition:\\
       0 & 1 & 9 \\
       0 & 0 & 1
     \end{pmatrix}
+    .
   \end{equation}
 \end{inparaenum}
 
@@ -399,12 +404,13 @@ Eigendecomposition of a symmetric, real, diagonizable matrix:
     {-1} & 1 & 0\\
     {-0.5} & 1.5 & {-0.5}
   \end{pmatrix}
+  .
 \end{equation}
 
-An $n \times n$-dimensional matrix is diagonizable if it has $n$
-linearly independent eigenvectors. The decomposition can for example be
-used to easily raise a matrix to a power, as you only have to raise the
-eigenvalue matrix $\Lambda$ to that power:
+\noindent An $n \times n$-dimensional matrix is diagonizable if it has
+$n$ linearly independent eigenvectors. The decomposition can for example
+be used to easily raise a matrix to a power, as you only have to raise
+the eigenvalue matrix $\Lambda$ to that power:
 
 \begin{equation}
   \begin{pmatrix}
@@ -423,11 +429,13 @@ eigenvalue matrix $\Lambda$ to that power:
     120 & {-104} & 120\\
     240 & {-240} & 256
   \end{pmatrix}
+  .
 \end{equation}
 
-In this work, our matrices don't need to be diagonizable, as this
-property is only required for the inverse of the eigenvector matrix.
-Section~\ref{sec:MGS} will give more information on that matter. 
+\noindent In this work, our matrices don't need to be diagonizable, as
+this property is only required for the inverse of the eigenvector
+matrix. Section~\ref{sec:MGS} will give more information on that matter.
+
 
 %----------------------------------------------------------------------%
 \subsubsection{Principal Component Analysis}
@@ -499,14 +507,59 @@ $f'(x)=-2x$ has only one zero at $x=0$. Now we only know that we have
 found an extremum and need to check whether its a maximum or minimum by
 looking at the second derivative $f''(x)=-2$. As $-2 < 0$, we now know
 that the extremum is a maximum. The same principal is applicable for
-ridges in higher dimensions. Here the first derivative, the gradient,
-. As described by
-Eberly~\cite{Eberly} and Lindeberg~\cite{Lindeberg}.
+ridges in higher dimensions. Here the first derivative at point $x$, the
+gradient, lies in the subspace spanned by $n-k$ eigenvectors of the
+Hessian, the second derivative, if $x$ is on an $n-k$ dimensional ridge.
+In other words, the dot product of the gradient with the remaining $k$
+eigenvectors is $0$, as the dot product is the scalar projection of two
+vectors or a measurement for how much the gradient points into the
+direction of the eigenvector. These eigenvectors therefore have to be
+orthogonal to the gradient and the corresponding eigenvalues have to be
+negative just like in the example above, as $x$ is a maximum along the
+direction of the $n-k$ eigenvectors and falls off along the direction of
+the k eigenvectors. The question remaining is how to decide which
+eigenvectors denote the ridge domain. Eberly~\cite{Eberly} and
+Lindeberg~\cite{Lindeberg} proposed two ways on how to sort the
+eigenvalues $\lambda_i$ in order to pick the right corresponding
+eigenvectors $\epsilon_i$:\\
+\begin{inparaenum}[]
+  \item Eberly
+  \begin{equation}
+   \lambda_1 \leq \cdots \leq \lambda_n 
+  \end{equation}
+  \item Lindeberg
+  \begin{equation}
+    \lvert \lambda_1 \rvert \geq \cdots \geq \lvert \lambda_n \rvert.
+  \end{equation}
+\end{inparaenum}
+Lindebergs method extracts a subset of the ridge features found by
+Eberly. Lindeberg discards a feature if there is along any eigenvector
+an upward bend, denoted by a positive eigenvalue, that is stronger than
+the downward bend along the $n-k$ eigenvectors found by Eberly. For the
+definition of Eberly, an upward bend along the ridge is irrelevant for
+its existence. This work will use Eberlys method and therefore the
+principle definition for the existence of an $n-k$ dimensional ridge at
+point $x \in \real^n$ is:\\
+
+\begin{equation}\label{eq:ridgeDot}
+  \nabla S(x) \cdot \epsilon_1 = \cdots = \nabla S(x) \cdot \epsilon_{k} = 0
+\end{equation}
+\begin{equation}
+  \lambda_k < 0
+\end{equation}
+
+\noindent The counterpart to ridges are valleys. These can be obtained
+by extracting ridges from the scalar field $-S(x)$ or by checking
+Equation~\ref{eq:ridgeDot} for the eigenvectors corresponding to the
+$k$ largest eigenvalues and $\lambda_k > 0$.
+\\(PICTURES FOR RIDGE TYPES)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Marching Ridges (Cubes?)}
+\subsection{Extracting Ridges of Co-Dimension One with Marching Cubes}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Parallel Vectors}
+\subsection{Extracting Ridge Lines with Parallel Vectors}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
