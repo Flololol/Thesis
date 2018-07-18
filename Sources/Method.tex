@@ -2,7 +2,27 @@
 \chapter{Method}\label{chap:Method}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Method and stuff.
+This chapter explains our principle approach on how to extract ridge
+features from uncertain scalar fields. In the usual case, ridges do not
+lie directly on the nodes of a cell, but inbetween. Therefore it is
+insufficient to only look at a single node of every member of the set of
+possibly correlated scalar fields to decide on the presence of a ridge.
+Thus in the $3$-dimensional case the actual node at the location we
+examine is the bottom left node of a cell of 8 nodes (see Figure~REF).
+This follows an implementation detail, as the scalar fields are usually
+traversed from bottom left to top right. Sampling these 8 nodes with a
+Monte-Carlo method would only give us Gaussian distributed values over
+the range of values at these locations, but no information about their
+change in either dimension. Otto and Theisel~\cite{Vortex} showed in
+their work that the derivative of Gaussian sampled cells without
+considering their neighborhood is non-Gaussian distributed. Therefore we
+add the 24 nodes around the 8 nodes of the cell to be able to calculate
+the gradient via central differences. As we also need the Hessian for
+every of the 8 nodes, we need the gradients of the 24 nodes surrounding
+the cell. This leads to 80 nodes making up the cell we want to draw
+samples from (see Figure~REF). With this we can create the uncertain
+scalar field from Section~\ref{sec:USF} with the underlying mean vector
+and covariance matrix fields.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Multivariate Gaussian Sampling}\label{sec:MGS}
@@ -11,3 +31,7 @@ Method and stuff.
 To analyse the uncertain scalar field obtained in Section~\ref{sec:USF},
 we need to draw samples from the underlying multivariate gaussian
 distribution.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Processing the cell}\label{sec:proc}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
