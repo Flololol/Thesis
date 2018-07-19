@@ -5,32 +5,98 @@
 This chapter explains our principle approach on how to extract ridge
 features from uncertain scalar fields. In the usual case, ridges do not
 lie directly on the nodes of a cell, but inbetween. Therefore it is
-insufficient to only look at a single node of every member of the set of
+insufficient to only look at single nodes of every member of the set of
 possibly correlated scalar fields to decide on the presence of a ridge.
 Thus in the $3$-dimensional case the actual node at the location we
-examine is the bottom left node of a cell of 8 nodes (see Figure~REF).
-This follows an implementation detail, as the scalar fields are usually
-traversed from bottom left to top right. Sampling these 8 nodes with a
-Monte-Carlo method would only give us Gaussian distributed values over
-the range of values at these locations, but no information about their
-change in either dimension. Otto and Theisel~\cite{Vortex} showed in
-their work that the derivative of Gaussian sampled cells without
-considering their neighborhood is non-Gaussian distributed. Therefore we
-add the 24 nodes around the 8 nodes of the cell to be able to calculate
-the gradient via central differences. As we also need the Hessian for
-every of the 8 nodes, we need the gradients of the 24 nodes surrounding
-the cell. This leads to 80 nodes making up the cell we want to draw
-samples from (see Figure~REF). With this we can create the uncertain
-scalar field from Section~\ref{sec:USF} with the underlying mean vector
-and covariance matrix fields.
+examine is the bottom left node of a cell of 8 nodes (see red node in
+Figure~\ref{fig:3DNH}). This follows an implementation detail, as the
+scalar fields in our case are traversed from bottom left to top right.
+Sampling these 8 nodes with a Monte-Carlo method would only give us
+Gaussian distributed values over the range of values at these locations,
+but no information about their change in either dimension outside the
+cell. Otto and Theisel~\cite{Vortex} tested in their work to derive a
+velocity vector $v$ in a two dimensional uncertain vector field by
+sampling the vector and its four neighboring vectors individually from
+their distributions. They then estimated the Jacobian $J$ with central
+differences on the neighboring vectors and multiplied it with the
+velocity vector, to get the acceleration vector $a = J v$. The resulting
+vectors were not Gaussian distributed anymore. They solved this issue by
+instead of sampling each vector individually, they sample the whole
+neighborhood of the vector to keep track of its change along the
+dimensions. Therefore we also inspect the 24 nodes adjacent to the 8
+nodes of the cell, to be able to calculate the gradient via central
+differences. As Theisel \etal{} were searching for vortex core lines in
+uncertain vector fields, they only needed to derive their field once, to
+be able to decide on the presence of a core line based on the
+eigenspace. As we base our detections on eigenvalues and vectors as
+well, we need to derive our uncertain scalar field twice. We therefore
+also add the adjacent nodes of the 24 supporting nodes to our considered
+neighborhood. This leads to 80 nodes making up the cell we want to draw
+samples from (see Figure~\ref{fig:NH}). With this we can create the
+uncertain scalar field from Section~\ref{sec:USF}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Multivariate Gaussian Sampling}\label{sec:MGS}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-To analyse the uncertain scalar field obtained in Section~\ref{sec:USF},
-we need to draw samples from the underlying multivariate gaussian
-distribution.
+Our uncertain scalar field $S_{\mathcal{N}}$ at point
+$x=(x_1,\dots,x_n)$ consists of a multivariate Gaussian distribution,
+made up from the mean vector $\mu_x$ and the covariance matrix $\Sigma_x$. The
+mean vector portrays the average values of the neighborhood of $x$ while
+the covariance matrix contains the variances of each value to each other
+around this mean. Unfortunately we cannot compute ridge criteria from
+these objects. Monte-Carlo methods offer a way to draw samples from
+multivariate normal distributions. The basis of this method is the affine
+transformation property of normal distributed vectors that states that
+any linear transformation of a normal vector is again normal:
+
+\begin{equation}
+    X \sim \mathcal{N}(\mu,\Sigma) \Rightarrow AX \sim \mathcal{N}(A\mu, A\Sigma A)
+\end{equation}
+
+\noindent for any dimensionality $d$ of vector $X$ and $d \times d$
+matrix $\Sigma$ and any $k \times d$ matrix $A$. By this property we
+know that if we have a standard normal distributed vector $Z \sim
+\mathcal{N}(0,I)$ with $I$ being an $d \times d$ identity matrix, then
+$X = AZ + \mu$ is from the distribution $X \sim \mathcal{N}(\mu, A
+A^\top)$. Now we simply have to find a matrix $A$ for which $AA^\top =
+\Sigma$. The Cholesky (Section~\ref{sec:cholesky}) and the
+Eigendecomposition (Section~\ref{sec:eigen}) are the two most popular
+methods to calculate such a matrix as the Cholesky decomposition is
+computationally efficient and the Eigendecomposition deliveres more
+numerical stability as well as a lot of predefined librarys. As our
+covariance matrices are only positive semi-definite, we need the
+extended version of Cholesky. Now we get the two decompositions:
+\begin{align}
+    &\Sigma_x = L D L^\top \\
+    &\Sigma_x = E \Lambda E^{-1},
+\end{align}
+In theory, a suitable matrix $A$ would now be either $A=L
+D^{\frac{1}{2}}$ or $A=E\Lambda^{\frac{1}{2}}$ for $\Sigma = AA^\top$.
+In practice, because of our relatively huge $80 \times 80$ dimensional
+covariance matrix we get negative elements in the diagonal matrix $D$
+even though our covariance matrix is positive semi-definite. Therefore
+we cannot take the root of $D$. The same issue goes for the
+Eigendecomposition where the eigenvalues become infinitesimally small
+negative values, hindering the computation of the root of $\Lambda$. As
+the sign of the eigenvalues determines the definiteness of a matrix,
+this makes our covariance matrix technically indefinite, as we have
+positive and negative eigenvalues. We solved this issue by simply
+multiplying the components without taking the root of the diagonal
+matrix, hence $A = LD$ and $A = E \Lambda$. This did not seem to affect
+the samples drawn with the Eigendecomposition, but the samples drawn
+with Cholesky showed some inconsistencies. Section (INSERT REF) will
+give more insight on that topic and compare the decompositions. Now we
+can proceed with the found $A$. In the 3 (2) dimensional  case we
+generate an 80 (24) dimensional standard uniformly distributed vector
+and transform it into a standard normal distributed vector $Z$ using
+the Box-Muller transformation (Section~\ref{sec:BM}). Now we multiply
+$A$ with $Z$ and add the mean vector of this location to get the sample
+vector $X = AZ + \mu_x, X \sim \mathcal{N}(\mu_x, \Sigma_x)$. This is
+only a single instance from the multivariate distribution, thus we
+repeat the sampling multiple times per cell to try to model the
+distribution as best as possible. With the now obtained sample vectors
+we can start to calculate ridge criteria at the location.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Processing the cell}\label{sec:proc}

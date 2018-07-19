@@ -112,20 +112,45 @@ Therefore, combining this with the need for neighboring points, we have
 with their neighboring points in every dimension and, because we also
 want to calculate the second derivative, their neighboring nodes as
 well. Cleared from redundant points, this results in 24 (80) nodes per
-neighborhood as illustrated in Figure (insert ref). We can take this
+neighborhood as illustrated in Figure~\ref{fig:NH}. We can take this
 neighborhood as a vector $v_x$ and calculate the $24$-dimensional mean
-vector at point $x$ of the mean vector field $m(x) = \frac{1}{m}
+vector at point $x$ of the mean vector field $\mu(x) = \frac{1}{m}
 \sum_{k=1}^m v_{x,k}$, followed by the $24 \times 24$-dimensional
-covariance matrix, with the covariance field being $C(x)= \frac{1}{m}
-\sum_{k=1}^m (v_{x,k} - m(x)){(v_{x,k} - m{(x)})}^\top$. Therefore our
+covariance matrix, with the covariance field being $\Sigma(x)= \frac{1}{m}
+\sum_{k=1}^m (v_{x,k} - \mu(x)){(v_{x,k} - \mu{(x)})}^\top$. Therefore our
 uncertain scalar fields follows a multivariate Gaussian distribution
 at every location
 
 \begin{equation}
-  S_{\mathcal{N}}(x) = \mathcal{N}(m(x), C(x)).\\
+  S_{\mathcal{N}}(x) = \mathcal{N}(\mu(x), \Sigma(x)).\\
 \end{equation}
 
-(Picture explaining neighborhood)
+\begin{figure}
+  \centering
+  \begin{subfigure}[b]{0.4\textwidth}
+    \includegraphics[width=\textwidth]{Images/2Dneighborhood.pdf}
+    \caption{2D neighborhood}
+    \label{fig:2DNH}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.49\textwidth}
+    \includegraphics[width=\textwidth]{Images/3Dneighborhood.pdf}
+    \caption{3D neighborhood}
+    \label{fig:3DNH}
+  \end{subfigure}
+  \caption{Support regions for the 2- and 3-dimensional case. A cell of
+  this size is created for every node of the initial scalar fields,
+  depending on the dimensionality of the data set. The red node marks
+  the location of the actual node at this position in the scalar field,
+  the green nodes belong to the cell we want to inspect and the blue
+  nodes are used to calculate the gradient of the green nodes via
+  central differences, as well as the gradient of the red node of
+  course. The outer pink nodes are used for the gradient of the blue
+  ones and with their gradient we can estimate the Hessian
+  matrices of the cell nodes. The neighboring points of the blue nodes
+  in Figure~\ref{fig:3DNH} are only drawn for the two upper right ones,
+  as drawing all of them would make the image too cluttered.}
+  \label{fig:NH}
+\end{figure}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Vector Fields}
@@ -256,8 +281,8 @@ $1$. This leads to the interpolated tensor:
 \end{equation}
 with $t$ being the relative distance of the desired location to tensor
 $A$. (see Figure ipol) We will only consider the cases for $n \in
-\{1,2,3\}$. \\
-(Picture explaining linear interpolation)
+\{1,2,3\}$.
+\\(Picture explaining linear interpolation)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Matrix Decompositions}
@@ -273,7 +298,7 @@ generate samples from a multivariate gaussian distribution, even though
 they are from different classes.
 
 %----------------------------------------------------------------------%
-\subsection{Cholesky Decomposition}
+\subsection{Cholesky Decomposition}\label{sec:cholesky}
 %----------------------------------------------------------------------%
 
 The Cholesky factorization is a decomposition of a square, hermititan,
@@ -306,7 +331,7 @@ L^\top$, where $L$ is a lower unitriangular matrix, meaning there are
 only ones on the diagonal, and $D$ is a diagonal matrix. The two
 decompositions are related as follows:
 
-\begin{equation}
+\begin{equation}\label{eq:LDL}
   A = LDL^\top = (L D^\frac{1}{2}) (D^\frac{1}{2}  L^\top).
 \end{equation}
 
@@ -367,7 +392,7 @@ variants of the decomposition:\\
 \end{inparaenum}
 
 %----------------------------------------------------------------------%
-\subsection{Eigendecomposition}
+\subsection{Eigendecomposition}\label{sec:eigen}
 %----------------------------------------------------------------------%
 
 The Eigendecomposition is a factorization of a square $n \times n$,
@@ -379,7 +404,7 @@ $\epsilon_i$ at column $i, i \in \{1,\dots,n\}$ of $E$. This follows the
 basic attribute of eigenvectors, as they only change by a scalar factor
 when multiplied with their respective matrix, meaning $A \epsilon =
 \lambda \epsilon$ and therefore $A E = E \Lambda$, which leads to the
-decomposition $A = E \Lambda E^{-1}$. Heres a simple example of the
+decomposition $A = E \Lambda E^{-1}$. Here is a simple example of the
 Eigendecomposition of a symmetric, real, diagonizable matrix:
 
 \begin{equation}
@@ -465,7 +490,7 @@ axes. See Figure~\ref{fig:PCA} for a graphical example.
 \end{figure}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Box-Muller Transformation}
+\section{Box-Muller Transformation}\label{sec:BM}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 The Box-Muller Transformation is a method to transform two uniformly
@@ -474,8 +499,8 @@ distributed random numbers. Let $U_1$ and $U_2$ be samples from the
 uniform distribution on the interval ($0$, $1$). Let $N_1$ and $N_2$ be:
 
 \begin{align}
-  N_1 = \sqrt{-2 \ln{U_1}} \cos (2 \pi U_2) \\
-  N_2 = \sqrt{-2 \ln{U_1}} \sin (2 \pi U_2).
+  &N_1 = \sqrt{-2 \ln{U_1}} \cos (2 \pi U_2) \\
+  &N_2 = \sqrt{-2 \ln{U_1}} \sin (2 \pi U_2).
 \end{align}
 
 \noindent Then $N_1$ and $N_2$ are independent random numbers with a
@@ -620,9 +645,9 @@ local triangle coordinates $s$, $t$ and $u$ with $u$ set to $1$:
 \noindent $V$ and $W$ are $3 \times 3$ matrices that are constructed
 from the vectors $v_i$ and $w_i$ at the three nodes of the fields with:
 \begin{align}
-  v_{12} = v_2 - v_1\\
-  v_{13} = v_3 - v_1\\
-  V = (v_1, v_{12}, v_{13})
+  &v_{12} = v_2 - v_1\\
+  &v_{13} = v_3 - v_1\\
+  &V = (v_1, v_{12}, v_{13})
 \end{align}
 \noindent and respectively for $w_i$ and $W$. Now two fields are
 parallel when:
@@ -669,5 +694,5 @@ are parallel. If $s+t \leq 1$ and $s$ and $t$ are both greather than
 zero, the point lies within the triangle and an extremum is found. With
 the triangle coordinates the Hessian at the point can be interpolated to
 check for $\lambda_2 < 0$ in the case of ridges or $\lambda_2 > 0$ for
-valleys. Instead of the derived gradient, the major eigenvector of the
-hessian can be used as well, if only ridges are needed.
+valleys. Alternatively the minor or major eigenvectors of the Hessian
+can be tested for parallelity, depending on the desired feature.
