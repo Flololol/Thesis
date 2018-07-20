@@ -9,15 +9,15 @@ insufficient to only look at single nodes of every member of the set of
 possibly correlated scalar fields to decide on the presence of a ridge.
 Thus in the $3$-dimensional case the actual node at the location we
 examine is the bottom left node of a cell of 8 nodes (see red node in
-Figure~\ref{fig:3DNH}). This follows an implementation detail, as the
-scalar fields in our case are traversed from bottom left to top right.
-Sampling these 8 nodes with a Monte-Carlo method would only give us
-Gaussian distributed values over the range of values at these locations,
-but no information about their change in either dimension outside the
-cell. Otto and Theisel~\cite{Vortex} tested in their work to derive a
-velocity vector $v$ in a two dimensional uncertain vector field by
-sampling the vector and its four neighboring vectors individually from
-their distributions. They then estimated the Jacobian $J$ with central
+Figure~\ref{fig:3DNH}). This follows an implementation detail, as our
+scalar fields are traversed from bottom left to top right. Sampling
+these 8 nodes with a Monte-Carlo method would only give us Gaussian
+distributed values over the range of values at these locations, but no
+information about their change in either dimension outside the cell.
+Otto and Theisel~\cite{Vortex} tested in their work to derive a velocity
+vector $v$ in a two dimensional uncertain vector field by sampling the
+vector and its four neighboring vectors individually from their
+distributions. They then estimated the Jacobian $J$ with central
 differences on the neighboring vectors and multiplied it with the
 velocity vector, to get the acceleration vector $a = J v$. The resulting
 vectors were not Gaussian distributed anymore. They solved this issue by
@@ -33,7 +33,11 @@ well, we need to derive our uncertain scalar field twice. We therefore
 also add the adjacent nodes of the 24 supporting nodes to our considered
 neighborhood. This leads to 80 nodes making up the cell we want to draw
 samples from (see Figure~\ref{fig:NH}). With this we can create the
-uncertain scalar field from Section~\ref{sec:USF}.
+uncertain scalar field from Section~\ref{sec:USF}. It is important to
+remember that we cannot compute ridge lines and surfaces directly on the
+uncertain scalar field, but on samples from it. Thus we sample the field
+multiple times and the result is a probability for the existence of the
+desired ridge feature in the cell.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Multivariate Gaussian Sampling}\label{sec:MGS}
@@ -41,14 +45,15 @@ uncertain scalar field from Section~\ref{sec:USF}.
 
 Our uncertain scalar field $S_{\mathcal{N}}$ at point
 $x=(x_1,\dots,x_n)$ consists of a multivariate Gaussian distribution,
-made up from the mean vector $\mu_x$ and the covariance matrix $\Sigma_x$. The
-mean vector portrays the average values of the neighborhood of $x$ while
-the covariance matrix contains the variances of each value to each other
-around this mean. Unfortunately we cannot compute ridge criteria from
-these objects. Monte-Carlo methods offer a way to draw samples from
-multivariate normal distributions. The basis of this method is the affine
-transformation property of normal distributed vectors that states that
-any linear transformation of a normal vector is again normal:
+made up from the mean vector $\mu_x$ and the covariance matrix
+$\Sigma_x$. The mean vector portrays the average values of the
+neighborhood of $x$ while the covariance matrix contains the variances
+of each value to each other around this mean. Unfortunately we cannot
+compute ridge criteria from these objects. Monte-Carlo methods offer a
+way to draw samples from multivariate normal distributions. The basis of
+multivariate Gaussian sampling is the affine transformation property of
+normal distributed vectors that states that any linear transformation of
+a normal vector is again normal:
 
 \begin{equation}
     X \sim \mathcal{N}(\mu,\Sigma) \Rightarrow AX \sim \mathcal{N}(A\mu, A\Sigma A)
@@ -84,14 +89,14 @@ this makes our covariance matrix technically indefinite, as we have
 positive and negative eigenvalues. We solved this issue by simply
 multiplying the components without taking the root of the diagonal
 matrix, hence $A = LD$ and $A = E \Lambda$. This did not seem to affect
-the samples drawn with the Eigendecomposition, but the samples drawn
+the samples drawn with the Eigendecomposition, but the samples generated
 with Cholesky showed some inconsistencies. Section (INSERT REF) will
 give more insight on that topic and compare the decompositions. Now we
 can proceed with the found $A$. In the 3 (2) dimensional  case we
 generate an 80 (24) dimensional standard uniformly distributed vector
-and transform it into a standard normal distributed vector $Z$ using
-the Box-Muller transformation (Section~\ref{sec:BM}). Now we multiply
-$A$ with $Z$ and add the mean vector of this location to get the sample
+and transform it into a standard normal distributed vector $Z$ using the
+Box-Muller transformation (Section~\ref{sec:BM}). Now we multiply $A$
+with $Z$ and add the mean vector of this location to get the sample
 vector $X = AZ + \mu_x, X \sim \mathcal{N}(\mu_x, \Sigma_x)$. This is
 only a single instance from the multivariate distribution, thus we
 repeat the sampling multiple times per cell to try to model the
@@ -99,5 +104,6 @@ distribution as best as possible. With the now obtained sample vectors
 we can start to calculate ridge criteria at the location.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Processing the cell}\label{sec:proc}
+\section{Alternative Ridge Extraction}\label{sec:ridgeextract}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
