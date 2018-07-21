@@ -104,6 +104,14 @@ distribution as best as possible. With the now obtained sample vectors
 we can start to calculate ridge criteria at the location.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Alternative Ridge Extraction}\label{sec:ridgeextract}
+\section{Ridge Extraction}\label{sec:ridgeextract}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+In this section we will cover the extraction of a ridgesurface in a
+3-dimensional scalar field. The 80-dimensional sample vector is split up
+according to the original nodes and then the 32 gradients of the first
+derivative are calculated via central differences. From them we estimate
+the 8 Hessians of the cell gradients. The conservative approach to
+extract the ridge surface would now be to calculate the dot product of
+the gradient and the minor eigenvector at every node and apply the
+modified Marching Cubes algorithm for iso value 0.
