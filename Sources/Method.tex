@@ -114,4 +114,146 @@ derivative are calculated via central differences. From them we estimate
 the 8 Hessians of the cell gradients. The conservative approach to
 extract the ridge surface would now be to calculate the dot product of
 the gradient and the minor eigenvector at every node and apply the
-modified Marching Cubes algorithm for iso value 0.
+modified Marching Cubes algorithm for isovalue 0, but this faces us with
+a problem that occurs when generating samples from a multivariate
+Gaussian distribution. Depending on the uncertainty at the location, the
+distribution of the values of the sample vector might vary heavily.
+Figure~\ref{fig:sampComp} illustrates this problem with samples drawn
+from a distribution in 2-dimensional space. Figure~\ref{fig:gradient}
+shows the scalar field for the function $f(x,y) = x^2$ for $x, y \in
+\{0,\dots,5\}$ and the gradients for the nodes of the cell in the
+middle. As you can see, the gradients are parallel and increase along
+the x-axis. We rotated that field by 90 degrees three times, so that the
+gradient in each field points orthogonal to the previous. Now we build
+the Gaussian distribution for these fields and draw five samples using
+the Eigendecomposition. We plot the gradients of the sampled fields, as
+they make the understanding of the samples easier.
+Figure~\ref{fig:samples} shows the gradients of each sample together
+with their eigenvectors crossing at the respective nodes. The individual
+samples relate to the parallel orientation of the original fields, but
+their general direction is mixed up between the axes and they vary in
+magnitude. The gradients of the green sample slightly point towards each
+other, indicating that the field is increasing between the nodes, which
+is never the case originally. Also interesting to note is that the
+orientation of the eigenvectors is identical for every sample, only the
+corresponding eigenvalue changes. Such heavy changes of the direction of
+the gradient inbetween members are possible, as the gradient always
+points towards the ridge. If the gradient is close to it, small changes
+in the position of the ridge can result in big directional changes. This
+makes the computation of ridge surfaces via Marching Cubes quite
+inconsistent, even without noise on the data.
+\begin{figure}
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=\textwidth]{Images/gradient.png}
+        \caption{}
+        \label{fig:gradient}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=\textwidth]{Images/samples.png}
+        \caption{}
+        \label{fig:samples}
+    \end{subfigure}
+    \caption{(a) Gradients in the field $f(x,y)=x^2$. The major
+    eigenvector (red) is parallel to the gradient as the gradient only
+    changes along the x-axis. The minor eigenvector (blue) is orthogonal
+    to them with eigenvalue 0. (b) Gradients of samples from the
+    Gaussian distribution over four rotated variants of the field from
+    Figure~\ref{fig:gradient} with their common eigenvectors. The
+    eigenvectors are displayed as lines, as they yield no natural
+    orientation. These samples were obtained with the
+    Eigendecomposition.}
+    \label{fig:sampComp}
+\end{figure}
+If we would now try to extract ridges with the conventional
+Marching Cubes algorithm and only accept features where the dot product
+of the gradient and the minor eigenvector is exactly 0, we would find
+nothing. This is especially true for interpolated vectors as a whole,
+due to numerical issues. We can try to challenge this problem by giving
+a tolerance $t$ for the dot product to be 0, but the optimal value for the
+tolerance depends on the uncertainty at the location and basically the
+knowledge of where the ridge actually is. To further illustrate this
+problem, we took the 3-dimensional scalar field corresponding to the
+function $f(x,y,z) = \cos{(x)} + \cos{(y)} + \cos{(z)}$ in the domain
+$[0, 4 \pi] \times [0, 4\pi] \times [0, 4\pi]$. This function is
+periodical and therefore we can easily shift the whole domain along a
+dimension by adding constants to $x, y$ or $z$. Figure~\ref{fig:ridge}
+shows the certain ridge surface for this scalar field. As we have a
+cosinus function starting at 0 and ending at $4\pi$ for every dimension,
+we have two full waves along either dimension with their maxima in the
+middle at $2\pi$. This can be easily seen in the Figure with small
+surfaces orthogonal to the $x$ and $y$ dimension and a bigger surface
+seperating the two waves in $z$ direction. The ridge surfaces below the
+bigger surface are identical to the ones visible above. Now we add small
+constants drawn from a uniform distribution to $x, y$ and $z$ to
+generate an ensemble of scalar fields with their ridge moved around the
+original one. Now we calculate the uncertain ridge surface of the
+distribution with 100 samples drawn per cell and only require the
+absolute of the dot product to be smaller than $t=0.05$. The resulting
+surface is shown in Figure~\ref{fig:MCridge}. Holes are visible at
+equivalent distances. They are at the mutual inflection points of the
+scalar field. Here, the values of the scalar field are close to zero and
+therefore the ordering of the eigenvalus by Eberly (Equation
+\ref{eq:Eberly}) is inconsistent, as the eigenvalues are very similar.
+If we now increase the tolerance to try to fill these holes, we pick up
+a lot of undesired features. For $t=0.25$ (Figure~\ref{fig:MCridgetol})
+the holes are still visible, but already a lot of undesired features
+clutter the view. For $t=0.5$ (Figure~\ref{fig:MCridgetop}) the holes are
+barely visible in the broad noise on the surface, but the smaller surfaces
+on top and bottom are hard to distinguish from the surrounding false
+positives. This brings in the need for an approximate ridge criterion
+that adapts to local properties of the field.
+
+\begin{figure}
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=\textwidth]{Images/sfield.png}
+        \caption{field}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=\textwidth]{Images/ridge.png}
+        \caption{surface}
+    \end{subfigure}
+    \caption{Ridge surface of the scalar field $f(x,y,z)=\cos(x)+\cos(y)
+    +\cos(z)$ with $x,y,z \in (0, 4\pi)$. The functions are periodic and
+    therefore the ridges are symmetric. The z axis is squished, even though
+    it has the same data range as the other axes to ease the spatial
+    understanding of the domain.}
+    \label{fig:ridge}
+\end{figure}
+\begin{figure}
+    \centering
+    \begin{subfigure}[]{0.7\textwidth}
+        \includegraphics[width=\textwidth]{Images/MCridge.png}
+        \caption{$t=0.1$}
+        \label{fig:MCridge}
+    \end{subfigure}
+    \begin{subfigure}[]{0.49\textwidth}
+        \includegraphics[width=\textwidth]{Images/MCridgetol.png}
+        \caption{$t=0.25$}
+        \label{fig:MCridgetol}
+    \end{subfigure}
+    \begin{subfigure}[]{0.49\textwidth}
+        \includegraphics[width=\textwidth]{Images/MCridgetoltop.png}
+        \caption{$t=0.5$}
+        \label{fig:MCridgetop}
+    \end{subfigure}
+    \caption{Uncertain ridge surfaces from the Marching Cubes algorithm
+    for different tolerances for the dot product of the gradient and the
+    minor eigenvector. For $t=0.1$ the big surface along $z$ has holes
+    at the inflection points of the field, where the values are close to
+    zero and some undesired features at the edges of the upper and lower
+    surfaces. As we increase the tolerance, the holes become smaller,
+    but a lot more false positives occur. Figure (c) offers a top down
+    view on the domain as there is a lot of cluttering on the sides.}
+    \label{fig:MCridges}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Estimated Ridge Extraction}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The underlying concept of the multivariate Gaussian sampling is to
+approximate the distribution by drawing enough samples from it, that
+the variety of the set is covered by the different samples. This
+suggests that it might be a good idea to consider ridge criteria that
+deliver an approximate result of the existence of a ridge in a small
+area.
