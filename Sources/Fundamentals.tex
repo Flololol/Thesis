@@ -264,7 +264,7 @@ Our discrete fields only provide information for a limited number of
 points along a dimension, therefore we need to estimate the values lying
 between the known locations. To ease computation we assume that the
 underlying functions of the fields are linear and apply linear
-interpolation to the tensors $A, B \in \real^{n \times n}$ at the
+interpolation to the tensors $A, B \in \real^{n \times m}$ at the
 neighboring points, independent of dimensionality. As we will explain in
 Chapter~\ref{chap:Method}, we only apply interpolation on the edges of
 cells and can therefore assume the distance between the two nodes to be
@@ -280,9 +280,20 @@ $1$. This leads to the interpolated tensor:
   \in \real^{n \times n}
 \end{equation}
 with $t$ being the relative distance of the desired location to tensor
-$A$. (see Figure ipol) We will only consider the cases for $n \in
+$A$. (see Figure ipol) We will only consider the cases for $n, m \in
 \{1,2,3\}$.
-\\(Picture explaining linear interpolation)
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.5\textwidth]{Images/linipol.pdf}
+  \caption{Tensors $A$ and $B$ at nodes in a discrete field. Linear
+  interpolation can be thought of as a percentage mixing of two tensors.
+  Therefore if the Tensor $T_{ipol}$ we want to interpolate is for
+  example at $20\%$ of the distance between $A$ and $B$, we add $80\%$
+  of $A$ to $20\%$ of $B$, as $T_{ipol}$ is more influenced by $A$,
+  because of its proximity.}
+
+\end{figure}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Matrix Decompositions}
@@ -517,11 +528,12 @@ crest of a mountain with terrain falling off on either side, we focus on
 a mathematical definition of ridges. In principal, a ridge is a local
 maximum of an $n$-dimensional function. The maximum of the
 $1$-dimensional function $f(x) = -x^2$ would be the $0$-dimensional
-point at $x=0$, the ridge point (INSERT REF). When we add a dimension,
-the domain becomes a $2$-dimensional surface, and the ridge point
-expands into a $1$-dimensional ridge line (INSERT REF). Adding another
-dimension turns the function domain into a $3$-dimensional volume and
-the ridge into a $2$-dimensional surface (INSERT REF). In general, the
+point at $x=0$, the ridge point (Figure~\ref{fig:ridge1D}). When we add
+a dimension, the domain becomes a $2$-dimensional surface, and the ridge
+point expands into a $1$-dimensional ridge line
+(Figure~\ref{fig:ridge2D}). Adding another dimension turns the function
+domain into a $3$-dimensional volume and the ridge into a
+$2$-dimensional surface (Figure~\ref{fig:ridge3D}). In general, the
 ridge is an $n-k$-dimensional manifold in an $n$-dimensional space for
 $k=\{1, \dots, n\}$. This means that ridge points and lines also exist
 in $3$-dimensional domains for example. This work focuses on ridges in
@@ -580,7 +592,25 @@ dimensional ridge at point $x \in \real^n$ is:\\
 by extracting ridges from the scalar field $-S(x)$ or by checking
 Equation~\ref{eq:ridgeDot} for the eigenvectors corresponding to the
 $k$ largest eigenvalues and $\lambda_k > 0$.
-\\(PICTURES FOR RIDGE TYPES)
+\begin{figure}
+  \begin{subfigure}[b]{0.33\textwidth}
+    \includegraphics[width=\textwidth]{Images/func1D.png}
+    \caption{$f(x)= -x^2$}
+    \label{fig:ridge1D}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.33\textwidth}
+    \includegraphics[width=\textwidth]{Images/func2D.png}
+    \caption{$f(x,y)= -x^2$}
+    \label{fig:ridge2D}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.33\textwidth}
+    \includegraphics[width=\textwidth]{Images/func3D.png}
+    \caption{$f(x,y,z)= -x^2$}
+    \label{fig:ridge3D}
+  \end{subfigure}
+  \caption{Ridges of co-dimension one for the function $f(x)=-x^2$ with
+  increasing dimensionality.}
+\end{figure}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Marching Cubes}

@@ -61,9 +61,9 @@ a normal vector is again normal:
 
 \noindent for any dimensionality $d$ of vector $X$ and $d \times d$
 matrix $\Sigma$ and any $k \times d$ matrix $A$. By this property we
-know that if we have a standard normal distributed vector $Z \sim
+know that if we have a standard normal distributed vector $N \sim
 \mathcal{N}(0,I)$ with $I$ being an $d \times d$ identity matrix, then
-$X = AZ + \mu$ is from the distribution $X \sim \mathcal{N}(\mu, A
+$X = AN + \mu$ is from the distribution $X \sim \mathcal{N}(\mu, A
 A^\top)$. Now we simply have to find a matrix $A$ for which $AA^\top =
 \Sigma$. The Cholesky (Section~\ref{sec:cholesky}) and the
 Eigendecomposition (Section~\ref{sec:eigen}) are the two most popular
@@ -90,14 +90,14 @@ positive and negative eigenvalues. We solved this issue by simply
 multiplying the components without taking the root of the diagonal
 matrix, hence $A = LD$ and $A = E \Lambda$. This did not seem to affect
 the samples drawn with the Eigendecomposition, but the samples generated
-with Cholesky showed some inconsistencies. Section (INSERT REF) will
+with Cholesky showed some inconsistencies. Chapter~\ref{chap:Eval} will
 give more insight on that topic and compare the decompositions. Now we
 can proceed with the found $A$. In the 3 (2) dimensional  case we
 generate an 80 (24) dimensional standard uniformly distributed vector
-and transform it into a standard normal distributed vector $Z$ using the
+and transform it into a standard normal distributed vector $N$ using the
 Box-Muller transformation (Section~\ref{sec:BM}). Now we multiply $A$
-with $Z$ and add the mean vector of this location to get the sample
-vector $X = AZ + \mu_x, X \sim \mathcal{N}(\mu_x, \Sigma_x)$. This is
+with $N$ and add the mean vector of this location to get the sample
+vector $X = AN + \mu_x, X \sim \mathcal{N}(\mu_x, \Sigma_x)$. This is
 only a single instance from the multivariate distribution, thus we
 repeat the sampling multiple times per cell to try to model the
 distribution as best as possible. With the now obtained sample vectors
@@ -183,20 +183,20 @@ field. As we have a cosinus function starting at 0 and ending at $4\pi$
 for every dimension, we have two full waves along either dimension with
 their maxima in the middle at $2\pi$. This can be easily seen in the
 Figure with small surfaces orthogonal to the $x$ and $y$ dimension and a
-bigger surface seperating the two waves in $z$ direction. The ridge
-surfaces below the bigger surface are identical to the ones visible
-above. Now we add small constants drawn from a uniform distribution to
-$x, y$ and $z$ to generate an ensemble of scalar fields with their ridge
-moved around the original one. Now we calculate the uncertain ridge
-surface of the distribution with 100 samples drawn per cell and only
-require the absolute of the dot product to be smaller than $t=0.05$. The
-resulting surface is shown in Figure~\ref{fig:MCridge}. Holes are
-visible at equivalent distances. They are at the mutual inflection
-points of the scalar field. Here, the values of the scalar field are
-close to zero and therefore the ordering of the eigenvalus by Eberly
-(Equation \ref{eq:Eberly}) is inconsistent, as the eigenvalues are very
-similar. If we now increase the tolerance to try to fill these holes, we
-pick up a lot of undesired features. For $t=0.25$
+bigger surface seperating the smaller surfaces in $z$ direction. The
+ridge surfaces below the bigger surface are identical to the ones
+visible above. Now we add small constants drawn from a uniform
+distribution to $x, y$ and $z$ to generate an ensemble of scalar fields
+with their ridge moved around the original one. Now we calculate the
+uncertain ridge surface of the distribution with 100 samples drawn per
+cell and only require the absolute of the dot product to be smaller than
+$t=0.05$. The resulting surface is shown in Figure~\ref{fig:MCridge}.
+Holes are visible at equivalent distances. They are at the mutual
+inflection points of the scalar field. Here, the values of the scalar
+field are close to zero and therefore the ordering of the eigenvalus by
+Eberly (Equation~\ref{eq:Eberly}) is inconsistent, as the eigenvalues
+are very similar. If we now increase the tolerance to try to fill these
+holes, we pick up a lot of undesired features. For $t=0.25$
 (Figure~\ref{fig:MCridgetol}) the holes are still visible, but already a
 lot of undesired features clutter the view. For $t=0.5$
 (Figure~\ref{fig:MCridgetop}) the holes are barely visible in the broad
@@ -348,7 +348,8 @@ features to the result. (MORE DETAILS OF THE RESULT?!?)
     from Equation~\ref{eq:criterion} and $d$ being the average spacing
     of the dimensions. The great surface perpendicular to $z$ has no
     holes and we are free from undesired features. The choice of $d$
-    determines the thickness of the ridge.}
+    determines the thickness of the ridge. The samples were drawn using
+    the Eigendecomposition.}
     \label{fig:newmethod}
 \end{figure}
 
@@ -375,8 +376,9 @@ around the set of eigenvectors then is more planar than linear. This
 can be observed by the relation of the second largest eigenvalue to the
 largest eigenvalue. The PCA filter therefore discards cells where the
 second largest eigenvalue is greater than a given percentage of the
-largest eigenvalue of the PCA subdomain. This filter has more effect for
-the conservative ridge extraction.
+largest eigenvalue of the PCA subdomain. Both these filters are also
+applicable for the conservative ridge extraction, with the eigenvalues
+and vectors at the interpolated point between the nodes.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Ridge Lines in 3D}
@@ -385,10 +387,10 @@ the conservative ridge extraction.
 For the calculation of uncertain ridge lines in 3-dimensional space we
 use the parallel vectors operator as described in Section~\ref{sec:PVO}
 and search for the points where the gradient field is parallel to its
-major eigenvectors. It deliveres a binary decision for the existence of
-a ridge line in the cell. If at least two faces of the cell contain a
-ridge, the cell is marked and the relative frequency of positive
-samples is the probability for that cell. We will not give too much
-attention to ridge lines in 3D, as the same method was used by Theisel
-\etal{} for the calculation of uncertain vortex cores and we add nothing
-new to this procedure.
+major eigenvectors. It deliveres a binary decision, just like the
+Marching Cubes approach, for the existence of a ridge line in the cell.
+If at least two faces of the cell contain a ridge, the cell is marked
+and the relative frequency of positive samples is the probability for
+that cell. We will not give too much attention to ridge lines in 3D, as
+the same method was used by Theisel \etal{} for the calculation of
+uncertain vortex cores and we add nothing new to this procedure.
