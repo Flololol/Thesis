@@ -30,35 +30,36 @@ equidistant for every dimension, whereas rectilinear grids may have
 irregular spacings along either axis and curvilinear grids may have
 irregular spacings between each grid node. This work focuses on uniform
 structured grids as it makes it easier to compare multiple grids at
-specific points in the domain.
+specific points in the domain. Due to the structured grids, we have a
+fixed number of nodes along a dimension, which determine the resolution
+of this axis.
 
 \begin{figure}
   \begin{subfigure}[b]{0.19\textwidth}
-    \includegraphics[clip=true, width=\textwidth]{Images/scattered.pdf}
+    \includegraphics[width=\textwidth]{Images/scattered.pdf}
     \caption{scattered}
     \label{fig:scattered}
   \end{subfigure}
   \begin{subfigure}[b]{0.2\textwidth}
-    \includegraphics[clip=true, width=\textwidth]{Images/unstructured.pdf}
+    \includegraphics[width=\textwidth]{Images/unstructured.pdf}
     \caption{unstructured}
     \label{fig:unstructured}
   \end{subfigure}
   \begin{subfigure}[b]{0.2\textwidth}
-    \includegraphics[clip=true, width=\textwidth]{Images/uniform.pdf}
+    \includegraphics[width=\textwidth]{Images/uniform.pdf}
     \caption{uniform}
     \label{fig:uniform}
   \end{subfigure}
   \begin{subfigure}[b]{0.2\textwidth}
-    \includegraphics[clip=true, width=\textwidth]{Images/rectilinear.pdf}
+    \includegraphics[width=\textwidth]{Images/rectilinear.pdf}
     \caption{rectilinear}
     \label{fig:rectilinear}
   \end{subfigure}
   \begin{subfigure}[b]{0.19\textwidth}
-    \includegraphics[clip=true, width=\textwidth]{Images/curvilinear.pdf}
+    \includegraphics[width=\textwidth]{Images/curvilinear.pdf}
     \caption{curvilinear}
     \label{fig:curvilinear}
   \end{subfigure}
-  
   \caption{Different types of grids. Uniform structured grids like in
   Figure~\ref{fig:uniform} can have varying distances inbetween
   dimensions, but along a dimension, the distances of the nodes are
@@ -72,54 +73,264 @@ specific points in the domain.
 \section{Scalar Fields}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\begin{figure}
+  \centering
+  \includegraphics[width=0.85\textwidth]{Images/microfluid.png}
+  \caption{3-dimensional view of a color coded 2-dimensional heightmap.
+  The color scale to the right gives information on the height values in
+  the visualization. This image shows a part of a microfluidic channel,
+  observed with a microscope. Microfluidics deal with the manipulation
+  and controlling of fluids in the range of micro- to pictoliters.
+  Picture from ZEISS Microscopy~\cite{HM}.}
+  \label{fig:HM}
+\end{figure}
+
 An $n$-dimensional field with a single scalar value at every point in
 space is called a scalar field. A simple example for a scalar field is a
 height map of some geographical terrain. It has two dimensions with a
-height value at every point encoded with color. In this work we will use
-the notation $S(x)$ for the scalar value at point $x = (x_1,\dots,x_n)$
-in the scalar field $S$ with $S: \real^n \rightarrow \real$. While in
-continuous scalar fields the values of every point are defined by a
-function, discrete scalar fields only have values at specific points in
-space. As real world data is often acquired by measuring certain
-locations and usually does not follow any graspable function, we will
-focus on discrete scalar fields in this work, where $n \in \{2,3\}$.
-This also applies to the other types of fields we will encounter,
-because they have the same resolution as the scalar field.
-\\(INSERT PICTURE OF HEIGHT MAP)
+height value at every point, usually encoded with color (Figure
+\ref{fig:HM}). In this work we will use the notation $S(x)$ for the
+scalar value at point $\text{x} = (x_1,\dots,x_n)$ in the scalar field $S$ with
+$S: \real^n \rightarrow \real$. While in continuous scalar fields the
+value of every point is defined by a function, discrete scalar fields
+only have values at specific points in space. As real world data is
+often acquired by measuring certain locations and usually does not
+follow any graspable function, we will focus on uniformly structured
+discrete scalar fields in this work, where $n \in \{2,3\}$. This also
+applies to the other types of fields we will encounter, because they
+have the same resolution as the scalar field.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Uncertain Scalar Fields}\label{sec:USF}
+\section{Vector Fields}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Unlike certain scalar fields, uncertain scalar fields have multiple
-values for every point of the domain. Following the work of Theisel
-\etal{\cite{Vortex}}, we assume that these values are Gaussian
-distributed over the $m$ members of the data ensemble obtained from
-simulations or measurements and therefore
+An $n$-dimensional vector field $V$ associates an $m$-dimensional vector
+with every point in space $V(x_1,\dots,x_n):\real^n \rightarrow \real^m$.
+If the vector field is the result of deriving a scalar field, thus the 
+vector field is the gradient of the scalar field, the vector field is
+called conservative. Conservative vector fields have the property, that
+the line integral along any path connecting two points is always equal.
+Since we are extracting features from scalar fields in this work, our
+vector fields will always be conservative and $n = m$.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Tensor Fields}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+An $n$-dimensional tensor field $H$ associates an arbitrarily
+dimensional tensor with every point in space $H(x_1,\dots,x_n): \real^n
+\rightarrow \real^{m_1 \times \cdots \times m_k}$, where $k \in
+\mathbb{N}$ is the rank of the tensor. Tensor fields are a
+generalization of scalar and vector fields as a tensor of rank 0 would
+represent a scalar and a tensor of rank 1 a vector. In our case, besides
+scalars and vector, the tensors we encounter are of rank 2 and therefore
+matrices in $\real^ {m \times l}$. As we will see later, the matrices
+are covariance and Hessian matrices and therefore quadratic per
+definition with $m = l$.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Linear Interpolation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.5\textwidth]{Images/linipol.pdf}
+  \caption{Tensors $A$ and $B$ at nodes in a discrete field. Linear
+  interpolation can be thought of as a percentage mixing of two tensors.
+  Therefore if the Tensor $T$ we want to interpolate is for
+  example at $20\%$ of the distance between $A$ and $B$, we add $80\%$
+  of $A$ to $20\%$ of $B$, as $T$ is more influenced by $A$,
+  because of its proximity.}
+  \label{fig:ipol}
+\end{figure}
+
+Our discrete fields only provide information for a limited number of
+points along a dimension, therefore we need to estimate values lying
+between known locations. To ease computation we assume that the
+underlying functions of the fields are linear, allowing us to use simple
+linear interpolation. As we will explain in Chapter~\ref{chap:Method},
+we will only interpolate between neighboring nodes of a cell and can
+therefore assume their distance to be 1. As we can express two
+neighboring scalars, vectors or matrices as tensors of rank 2 with $A, B
+\in \real^{n \times m}$ and $n,m \in \{1,2,3\}$, we generalize the
+interpolation to:
+\begin{equation}
+  T =
+  \begin{bmatrix}
+    (1-t) \cdot A_{11} + t \cdot B_{11} & \dots & (1-t) \cdot A_{n1} + t \cdot B_{n1} \\
+    \vdots & \ddots & \vdots \\
+    (1-t) \cdot A_{1m} + t \cdot B_{1m} & \dots & (1-t) \cdot A_{nm} + t \cdot B_{nm} \\
+  \end{bmatrix}
+  \in \real^{n \times m},
+\end{equation}
+with $T$ being the interpolated tensor at the relative distance $t$ to
+tensor $B$ (see Figure~\ref{fig:ipol}).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Derivatives}\label{sec:derivatives}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Since we are dealing with discrete scalar fields, we have no function we
+could derive to get the underlying gradient field. Instead we have to
+approximate the derivatives with finite difference methods. There are
+three forms which are commonly used:\\
+\begin{inparaenum}[(a)]
+  \item Forward Differences
+  \begin{equation}
+    \nabla f(x_i) = \frac{f(x_{i+1}) - f(x_i)}{h},
+  \end{equation}
+  \item Backward Differences
+  \begin{equation}
+    \nabla f(x_i) = \frac{f(x_i) - f(x_{i-1})}{h},
+  \end{equation}
+  \item Central Differences
+  \begin{equation}\label{eq:centDiff}
+    \nabla f(x_i) = \frac{f(x_{i+1}) - f(x_{i-1})}{2h},
+  \end{equation}
+\end{inparaenum}
+where $f(x_i)$ denotes the $i$-th point of the function $f(x): \real
+\rightarrow \real$ and $h$ the distance between two neighboring points.
+Forward and backward differences are used at the borders of the field,
+where no previous or succeeding point is available. As we will explain
+in Chapter~\ref{chap:Method}, with our current implementation we process
+cells with a fixed size and therefore do not consider border cases, thus
+this work focuses on central differences.
+
+%----------------------------------------------------------------------%
+\subsection{First Derivative}
+%----------------------------------------------------------------------%
+
+When deriving an $n$-dimensional scalar field $S$, we need to apply
+Equation~\ref{eq:centDiff} for every dimension. This results in $n$
+scalar values, representing the change of the scalar field in the
+respective dimension. These values can be interpreted as an
+$n$-dimensional vector, the gradient, pointing in the direction of
+greatest ascend for every point of the scalar field. This is the
+vector field $\nabla S(x)$.
+
+%----------------------------------------------------------------------%
+\subsection{Second Derivative}
+%----------------------------------------------------------------------%
+
+The second derivative of an $n$-dimensional scalar field is an $n$
+-dimensional tensor field with $\nabla^2 S:\real^n \rightarrow \real^{n
+\times n}$. This tensor field can again be obtained with the central
+difference method applied to every dimension of the gradient field. Here
+we get an $n$-dimensional vector per dimension as we are subtracting the
+previous gradient from the succeeding gradient of point $x$ along any
+dimension. These vectors represent the respective columns of the so
+called Hessian matrix. The Hessian matrix $H$ is a specification of the
+Jacobian Matrix $J$, which derives any vector valued function $f(x):
+\real^n \rightarrow \real^m$, $J \in \real^{m \times n}$. The Hessian
+matrix is obtained when deriving a conservative vector field, therefore
+the Hessian is quadratic with:
+
+\begin{equation}
+  H =
+  \begin{bmatrix}
+    \frac{\partial^2 S}{\partial x_1^2} & \frac{\partial^2 S}{\partial x_1 \partial x_2} & \dots & \frac{\partial^2 S}{\partial x_1 \partial x_n}\\
+    \frac{\partial^2 S}{\partial x_2 \partial x_1} & \frac{\partial^2 S}{\partial x_2^2} & \dots & \frac{\partial^2 S}{\partial x_2 \partial x_n}\\
+    \vdots & \vdots & \ddots & \vdots \\
+    \frac{\partial^2 S}{\partial x_n \partial x_1} & \frac{\partial^2 S}{\partial x_n \partial x_2} & \dots & \frac{\partial^2 S}{\partial x_n^2}
+  \end{bmatrix}
+  \in \real^{n \times n}.
+\end{equation}
+
+\noindent According to Schwarz's theorem of the symmetry of second
+derivatives ([is wikipedia enough reference?]), the Hessian is assumed
+to be symmetric, therefore the eigenvectors are orthogonal and the
+eigenvalues are real valued. The eigenvalues of the Hessian denote the
+second directional derivative of the scalar field along the direction of
+the corresponding eigenvector, and thus the change of the gradient in
+the direction of the eigenvector. The eigenvectors are the axis along
+which the gradient changes the most and the eigenvalues determine by how
+much. Independent of the direction taken along the eigenvector, a
+negative eigenvalue pushes the gradient against the direction taken,
+whereas a positive eigenvalue scales the gradient along its direction.
+Figure~\ref{fig:gradEV} explains this relation on a simple example.
+\begin{figure}
+  \centering
+  \includegraphics[width=0.7\textwidth]{Images/gradEV.pdf}
+  \caption{Influence of the eigenvectors and the sign of their
+  eigenvalues on the gradient (green) along their direction. The
+  eigenvalues show us, that if we take a step along the direction of the
+  gradient, the gradient turns into the direction depicted by the black
+  arrow, as he is scaled along the red eigenvector and squished along
+  the blue eigenvector.}
+  \label{fig:gradEV}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Uncertain Scalar Fields}\label{sec:USF}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.75\textwidth]{Images/gauss.pdf}
+  \caption{Probability density function for a random variable $X$ from a
+   Gaussian distribution for different values of the mean and variance.
+   Low variance (blue) equals a high probability for values close to the
+   mean, whereas high variance (yellow) leads to wider spread
+   probabilities. The mean value determines the peak of the probability
+   curve. The red curve shows a standard normal distribution with mean
+   $\mu = 0$ and variance $\sigma^2 = 1$. Image from Wikipedia
+   \cite{Gauss}.}
+   \label{fig:gauss}
+\end{figure}
+
+In computer science, simulations are more and more used to model real
+world problems, making use of todays computational power. For example, a
+common way to estimate the weather of the following days is to run
+multiple simulations with slightly changing parameters. Such simulations
+lead to sets of correlated fields with slight differences between the
+members of the ensemble. Analyzing every member individually and
+comparing them to the others is infeasible, which raises the need for a
+simultaneous analysis of the results. As we are extracting features from
+scalar fields, we introduce the uncertain scalar field, containing the
+information about the distribution of the data. Many physical phenomena
+are modeled with Gaussian (normal) distributions. A Gaussian
+distribution assumes that the data is distributed around a mean $\mu$
+with standard deviation $\sigma$ and variance $\sigma^2$. The
+probability for the value of a variable $X$ from the distribution is
+given by the probability density function
+
+\begin{equation}
+  \phi_{\mu, \sigma^2}(X) = \frac{1}{\sqrt{2 \pi \sigma^2}} e^{-\frac{(X - \mu)^2}{2 \sigma^2}},
+\end{equation}
+
+assigning a higher probability to values closer to the mean, leading to
+the characteristic Gauss bells visible in Figure~\ref{fig:gauss}. To
+obtain our uncertain scalar field, we give it the same resolution as the
+members of the ensemble, assuming they have equal resolutions, and
+calculate the mean and the variance for every point of the field. The
+mean is defined as $\mu_x = \frac{1}{m} \sum_{k=1}^m S_k(x)$ and the
+variance as $\sigma_x^2 = \frac{1}{m} \sum_{k=1}^m (S_k(x)-\mu_x)^2$ and
+therefore our uncertain scalar field as
 
 \begin{equation}
   S_{\mathcal{N}}(x) = \mathcal{N}(\mu_{x}, \sigma_{x}^2),
 \end{equation}
 
-\noindent where $\mu_x$ is the mean scalar value and $\sigma_{x}^2$ the
-variance of the $m$ entities at point $x = (x_1,\dots,x_n)$. As they
-also pointed out in their work, we need to consider the neighborhood of
-$x$, so that the derivatives of the uncertain scalar field are Gaussian
-distributed as well. As we will explain in Chapter~\ref{chap:Method}, we
-will search for ridges (Section~\ref{sec:Ridges}) inside cells.
-Therefore, combining this with the need for neighboring points, we have
-4 (or 8 in the 3D case) nodes of the cell we want to observe, together
-with their neighboring points in every dimension and, because we also
-want to calculate the second derivative, their neighboring nodes as
-well. Cleared from redundant points, this results in 24 (80) nodes per
-neighborhood as illustrated in Figure~\ref{fig:NH}. We can take this
-neighborhood as a vector $v_x$ and calculate the $24$-dimensional mean
-vector at point $x$ of the mean vector field $\mu(x) = \frac{1}{m}
-\sum_{k=1}^m v_{x,k}$, followed by the $24 \times 24$-dimensional
-covariance matrix, with the covariance field being $\Sigma(x)= \frac{1}{m}
-\sum_{k=1}^m (v_{x,k} - \mu(x)){(v_{x,k} - \mu{(x)})}^\top$. Therefore our
-uncertain scalar fields follows a multivariate Gaussian distribution
-at every location
+\noindent for the $m$ entities at point $x = (x_1,\dots,x_n)$.
+
+(tobechanged)
+As they also pointed out in their work, we need to consider the
+neighborhood of $x$, so that the derivatives of the uncertain scalar
+field are Gaussian distributed as well. As we will explain in
+Chapter~\ref{chap:Method}, we will search for ridges
+(Section~\ref{sec:Ridges}) inside cells. Therefore, combining this with
+the need for neighboring points, we have 4 (or 8 in the 3D case) nodes
+of the cell we want to observe, together with their neighboring points
+in every dimension and, because we also want to calculate the second
+derivative, their neighboring nodes as well. Cleared from redundant
+points, this results in 24 (80) nodes per neighborhood as illustrated in
+Figure~\ref{fig:NH}. We can take this neighborhood as a vector $v_x$ and
+calculate the $24$-dimensional mean vector at point $x$ of the mean
+vector field $\mu(x) = \frac{1}{m} \sum_{k=1}^m v_{x,k}$, followed by
+the $24 \times 24$-dimensional covariance matrix, with the covariance
+field being $\Sigma(x)= \frac{1}{m} \sum_{k=1}^m (v_{x,k} -
+\mu(x)){(v_{x,k} - \mu{(x)})}^\top$. Therefore our uncertain scalar
+fields follows a multivariate Gaussian distribution at every location
 
 \begin{equation}
   S_{\mathcal{N}}(x) = \mathcal{N}(\mu(x), \Sigma(x)).\\
@@ -153,149 +364,6 @@ at every location
 \end{figure}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Vector Fields}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-An $n$-dimensional vector field $V$ associates an $m$-dimensional vector
-with every point in space $V(x_1,\dots,x_n):\real^n \rightarrow \real^m$.
-If the vector field is the result of deriving a scalar field, thus the 
-vector field is the gradient of the scalar field, the vector field is
-called conservative. Conservative vector fields have the property, that
-the line integral along any path connecting two points is always equal.
-Since we are extracting features from scalar fields in this work, our
-vector fields will always be conservative and $n = m$.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Tensor Fields}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-An $n$-dimensional tensor field $H$ associates an $l \times
-m$-dimensional tensor with every point in space $H(x_1,\dots,x_n):
-\real^n \rightarrow \real^{l \times m}$. Tensor fields are a
-generalization of scalar and vector fields as a tensor with $l = m = 1$
-would represent a scalar, and with $l > 1$ and $m = 1$ a vector. In our
-case, the tensor field is a result of deriving a vector field, thus $n =
-l = m$.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Derivatives}\label{sec:derivatives}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-Since we are dealing with discrete scalar fields, we have no function we
-could derive to get the underlying gradient field. Instead we have to
-approximate the derivatives with finite difference methods. There are
-three forms which are commonly used:\\
-\\
-\begin{inparaenum}[(a)]
-  \item Forward Differences
-  \begin{equation}
-    \nabla f(x_i) = \frac{f(x_{i+1}) - f(x_i)}{h}
-  \end{equation}
-  \item Backward Differences
-  \begin{equation}
-    \nabla f(x_i) = \frac{f(x_i) - f(x_{i-1})}{h}
-  \end{equation}
-  \item Central Differences
-  \begin{equation}\label{eq:centDiff}
-    \nabla f(x_i) = \frac{f(x_{i+1}) - f(x_{i-1})}{2h}
-  \end{equation}
-\end{inparaenum}
-where $f(x_i)$ denotes the $i$-th point of the function $f(x): \real
-\rightarrow \real$ and $h$ the distance between two neighboring points.
-Forward and backward differences are used at the borders of the field,
-where no previous or succeeding point is available. As we will explain
-in Chapter~\ref{chap:Method}, with our current implementation we process
-cells with a fixed size and therefore do not consider border cases, thus
-this work focuses on central differences.
-
-%----------------------------------------------------------------------%
-\subsection{First Derivative}
-%----------------------------------------------------------------------%
-
-When deriving an $n$-dimensional scalar field $S$, we need to apply
-Equation~\ref{eq:centDiff} for every dimension. This results in $n$
-scalar values, representing the change of the scalar field in the
-respective dimensions. These values can be interpreted as an
-$n$-dimensional vector, pointing in the direction of greatest ascend for
-every point of the scalar field. This is the gradient field $\nabla
-S(x)$.
-
-%----------------------------------------------------------------------%
-\subsection{Second Derivative}
-%----------------------------------------------------------------------%
-
-The second derivative of an $n$-dimensional scalar field is an $n$
--dimensional tensor field with $\nabla^2 S:\real^n \rightarrow \real^{n
-\times n}$. This tensor field can again be obtained with the central
-difference method applied to every dimension of the gradient field. Here
-we get an $n$-dimensional vector per dimension as we are subtracting the
-previous gradient from the succeeding gradient of point $x$ along any
-dimension. These vectors represent the respective columns of the so
-called Hessian matrix. The Hessian matrix $H$ is a specification of the
-Jacobian Matrix $J$, which derives any vector valued function $f(x):
-\real^n \rightarrow \real^m$, $J \in \real^{m \times n}$. The Hessian
-matrix is obtained when deriving a conservative vector field, therefore
-the Hessian is quadratic with:
-
-\begin{equation}
-  H =
-  \begin{bmatrix}
-    \frac{\partial^2 S}{\partial x_1^2} & \frac{\partial^2 S}{\partial x_1 \partial x_2} & \dots & \frac{\partial^2 S}{\partial x_1 \partial x_n}\\
-    \frac{\partial^2 S}{\partial x_2 \partial x_1} & \frac{\partial^2 S}{\partial x_2^2} & \dots & \frac{\partial^2 S}{\partial x_2 \partial x_n}\\
-    \vdots & \vdots & \ddots & \vdots \\
-    \frac{\partial^2 S}{\partial x_n \partial x_1} & \frac{\partial^2 S}{\partial x_n \partial x_2} & \dots & \frac{\partial^2 S}{\partial x_n^2}
-  \end{bmatrix}
-  \in \real^{n \times n}.
-\end{equation}
-
-\noindent According to Schwarz's theorem of the symmetry of second
-derivatives ([ref]), the Hessian is assumed to be symmetric, therefore
-the eigenvectors are orthogonal and the eigenvalues are real valued. The
-eigenvalues of the Hessian denote the second directional derivative of
-the scalar field along the direction of the corresponding eigenvector,
-and thus the change of the gradient in the direction of the eigenvector.
-\\(EXAMPLE?!)
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Linear Interpolation}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-Our discrete fields only provide information for a limited number of
-points along a dimension, therefore we need to estimate the values lying
-between the known locations. To ease computation we assume that the
-underlying functions of the fields are linear and apply linear
-interpolation to the tensors $A, B \in \real^{n \times m}$ at the
-neighboring points, independent of dimensionality. As we will explain in
-Chapter~\ref{chap:Method}, we only apply interpolation on the edges of
-cells and can therefore assume the distance between the two nodes to be
-$1$. This leads to the interpolated tensor:
-
-\begin{equation}
-  T_{ipol} =
-  \begin{bmatrix}
-    (1-t) \cdot A_{11} + t \cdot B_{11} & \dots & (1-t) \cdot A_{1n} + t \cdot B_{1n} \\
-    \vdots & \ddots & \vdots \\
-    (1-t) \cdot A_{n1} + t \cdot B_{n1} & \dots & (1-t) \cdot A_{nn} + t \cdot B_{nn} \\
-  \end{bmatrix}
-  \in \real^{n \times n}
-\end{equation}
-with $t$ being the relative distance of the desired location to tensor
-$A$. (see Figure ipol) We will only consider the cases for $n, m \in
-\{1,2,3\}$.
-
-\begin{figure}
-  \centering
-  \includegraphics[width=0.5\textwidth]{Images/linipol.pdf}
-  \caption{Tensors $A$ and $B$ at nodes in a discrete field. Linear
-  interpolation can be thought of as a percentage mixing of two tensors.
-  Therefore if the Tensor $T_{ipol}$ we want to interpolate is for
-  example at $20\%$ of the distance between $A$ and $B$, we add $80\%$
-  of $A$ to $20\%$ of $B$, as $T_{ipol}$ is more influenced by $A$,
-  because of its proximity.}
-
-\end{figure}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Matrix Decompositions}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -316,13 +384,13 @@ The Cholesky factorization is a decomposition of a square, hermititan,
 positive definite matrix $A$ into the product of a lower-triangular
 matrix L and its conjugate transpose $A = L L^*$. A matrix $C$ is
 hermitian if the diagonal elements are real valued and $C_{ij} =
-\overline{C_{ji}}$, meaning that $\overline{C_{ji}}$ is the complex
+\overline{C}_{ji}$, meaning that $\overline{C}_{ji}$ is the complex
 conjugate of $C_{ij}$. Two complex numbers are complex conjugate if they
 have equal real and imaginary parts, but opposite signs. For example,
-$1+i$ is the complex conjugate of $1-i$. Following this property, the
-standard Cholesky decomposition is also applicable for every real
-valued, symmetric, positive definite matrix, resulting in a lower
-triangular real valued matrix and its transpose $A = L L^\top$. We
+$1+i \in \mathbb{C}$ is the complex conjugate of $1-i$. Following this
+property, the standard Cholesky decomposition is also applicable for
+every real valued, symmetric, positive definite matrix, resulting in a
+lower triangular real valued matrix and its transpose $A = L L^\top$. We
 will only deal with real valued matrices in this work and therefore
 follow this notation. A simple way to determine the definiteness of a
 matrix is to look at its eigenvalues. If every eigenvalue $\lambda$ of a
@@ -477,18 +545,7 @@ matrix. Section~\ref{sec:MGS} will give more information on that matter.
 \subsubsection{Principal Component Analysis}
 %----------------------------------------------------------------------%
 
-Even though the Principal Component Analysis (PCA) is not a decomposition
-in itself, it is an application of the Eigendecomposition. In general,
-the PCA fits an $n$-dimensional ellipsoid around a set of possibly
-correlated points. The first principle component then corresponds to the
-axis of biggest magnitude of the ellipsoid and therefore the axis of the
-largest variance of the data. The principal components are always
-orthogonal to each other. When the Eigendecomposition is applied to
-a matrix containing correlated points, the resulting eigenvectors match
-the principal components, and the eigenvalues the variance along those
-axes. See Figure~\ref{fig:PCA} for a graphical example.
-
-\begin{figure}
+\begin{figure}[t]
   \centering
   \includegraphics[width=0.75\textwidth]{Images/PCA.pdf}
   \caption{Principal Component Analysis of a set of points in
@@ -499,6 +556,17 @@ axes. See Figure~\ref{fig:PCA} for a graphical example.
   points as columns.}
   \label{fig:PCA}
 \end{figure}
+
+Even though the Principal Component Analysis (PCA) is not a decomposition
+in itself, it is an application of the Eigendecomposition. In general,
+the PCA fits an $n$-dimensional ellipsoid around a set of possibly
+correlated points. The first principle component then corresponds to the
+axis of biggest magnitude of the ellipsoid and therefore the axis of the
+largest variance of the data. The principal components are always
+orthogonal to each other. When the Eigendecomposition is applied to
+a matrix containing correlated points, the resulting eigenvectors match
+the principal components, and the eigenvalues the variance along those
+axes. See Figure~\ref{fig:PCA} for a graphical example.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Box-Muller Transformation}\label{sec:BM}
@@ -625,7 +693,7 @@ consulted that gives information on which edges of the cell connect such
 two nodes. If every value is above or below the isovalue, the cell does
 not contain a surface. Now linear interpolation is used to find the
 location of the isosurface on the respective edges and the found points
-are vertices of a triangle meshes. Figure~\ref{fig:MCTable} shows the
+are vertices of a triangle mesh. Figure~\ref{fig:MCTable} shows the
 15 unique configurations for a surface in the cell, without
 rotated variants. The same principle is used for the two dimensional
 version, the Marching Squares algorithm. In that case the lookup table
