@@ -63,9 +63,9 @@ of this axis.
   \caption{Different types of grids. Uniform structured grids like in
   Figure~\ref{fig:uniform} can have varying distances inbetween
   dimensions, but along a dimension, the distances of the nodes are
-  equal. Figure~\ref{fig:uniform}, \ref{fig:rectilinear} and
-  \ref{fig:curvilinear} are variants of structured grids and therefore
-  their connectivity is given by the ordering of the nodes.}
+  equal. The Figures~\subref{fig:uniform}, \subref{fig:rectilinear} and
+  \subref{fig:curvilinear} are variants of structured grids and
+  therefore their connectivity is given by the ordering of the nodes.}
   \label{fig:grids}
 \end{figure}
 
@@ -190,11 +190,17 @@ three forms which are commonly used:\\
 \end{inparaenum}
 where $f(x_i)$ denotes the $i$-th point of the function $f(x): \real
 \rightarrow \real$ and $h$ the distance between two neighboring points.
-Forward and backward differences are used at the borders of the field,
-where no previous or succeeding point is available. As we will explain
-in Chapter~\ref{chap:Method}, with our current implementation we process
-cells with a fixed size and therefore do not consider border cases, thus
-this work focuses on central differences.
+This gives us the change of $f(x_i)$ along its only dimension. If we are
+dealing with higher order functions, we need to reapply the difference
+methods to all dimensions of the function. Forward and backward
+differences are only used to estimate the gradient at the borders of
+fields, where no previous or succeeding point is available. They yield
+lower precision for the estimation, because they are missing information
+about the change in one direction along the dimension. As we will
+explain in Chapter~\ref{chap:Method}, with our current implementation we
+process cells with a fixed size to always have the higher precision of
+central differences. We therefore do not consider border cases and have
+a padding of unprocessed cells around our results.
 
 %----------------------------------------------------------------------%
 \subsection{First Derivative}
@@ -222,8 +228,7 @@ dimension. These vectors represent the respective columns of the so
 called Hessian matrix. The Hessian matrix $H$ is a specification of the
 Jacobian Matrix $J$, which derives any vector valued function $f(x):
 \real^n \rightarrow \real^m$, $J \in \real^{m \times n}$. The Hessian
-matrix is obtained when deriving a conservative vector field, therefore
-the Hessian is quadratic with:
+denotes the second derivative of a scalar field with
 
 \begin{equation}
   H =
@@ -233,21 +238,22 @@ the Hessian is quadratic with:
     \vdots & \vdots & \ddots & \vdots \\
     \frac{\partial^2 S}{\partial x_n \partial x_1} & \frac{\partial^2 S}{\partial x_n \partial x_2} & \dots & \frac{\partial^2 S}{\partial x_n^2}
   \end{bmatrix}
-  \in \real^{n \times n}.
+  \in \real^{n \times n}
 \end{equation}
 
-\noindent According to Schwarz's theorem of the symmetry of second
-derivatives ([is wikipedia enough reference?]), the Hessian is assumed
-to be symmetric, therefore the eigenvectors are orthogonal and the
-eigenvalues are real valued. The eigenvalues of the Hessian denote the
-second directional derivative of the scalar field along the direction of
-the corresponding eigenvector, and thus the change of the gradient in
-the direction of the eigenvector. The eigenvectors are the axis along
-which the gradient changes the most and the eigenvalues determine by how
-much. Independent of the direction taken along the eigenvector, a
-negative eigenvalue pushes the gradient against the direction taken,
-whereas a positive eigenvalue scales the gradient along its direction.
-Figure~\ref{fig:gradEV} explains this relation on a simple example.
+\noindent and some resulting particularities. According to Schwarz's
+theorem of the symmetry of second derivatives~\cite{Schwarz}, the
+Hessian is assumed to be symmetric, therefore the eigenvectors are
+orthogonal and the eigenvalues are real valued. The eigenvalues of the
+Hessian denote the second directional derivative of the scalar field
+along the direction of the corresponding eigenvector, and thus the
+change of the gradient in the direction of the eigenvector. The
+eigenvectors are the axis along which the gradient changes the most and
+the eigenvalues determine by how much. Independent of the direction
+taken along the eigenvector, a negative eigenvalue pushes the gradient
+against the direction taken, whereas a positive eigenvalue scales the
+gradient along its direction. Figure~\ref{fig:gradEV} explains this
+relation on a simple example.
 \begin{figure}
   \centering
   \includegraphics[width=0.7\textwidth]{Images/gradEV.pdf}
@@ -298,45 +304,21 @@ given by the probability density function
   \phi_{\mu, \sigma^2}(X) = \frac{1}{\sqrt{2 \pi \sigma^2}} e^{-\frac{(X - \mu)^2}{2 \sigma^2}},
 \end{equation}
 
-assigning a higher probability to values closer to the mean, leading to
-the characteristic Gauss bells visible in Figure~\ref{fig:gauss}. To
-obtain our uncertain scalar field, we give it the same resolution as the
-members of the ensemble, assuming they have equal resolutions, and
-calculate the mean and the variance for every point of the field. The
-mean is defined as $\mu_x = \frac{1}{m} \sum_{k=1}^m S_k(x)$ and the
-variance as $\sigma_x^2 = \frac{1}{m} \sum_{k=1}^m (S_k(x)-\mu_x)^2$ and
-therefore our uncertain scalar field as
+\noindent assigning a higher probability to values closer to the mean,
+leading to the characteristic Gauss bells visible in
+Figure~\ref{fig:gauss}. To obtain our uncertain scalar field, we give it
+the same resolution as the members of the ensemble, assuming they have
+equal resolutions, and calculate the mean and the variance for every
+point of the field. The mean is defined as $\mu_x = \frac{1}{m}
+\sum_{k=1}^m S_k(x)$ and the variance as $\sigma_x^2 = \frac{1}{m}
+\sum_{k=1}^m {(S_k(x)-\mu_x)}^2$ and therefore our uncertain scalar field
+as
 
 \begin{equation}
   S_{\mathcal{N}}(x) = \mathcal{N}(\mu_{x}, \sigma_{x}^2),
 \end{equation}
 
-\noindent for the $m$ entities at point $x = (x_1,\dots,x_n)$.
-
-(tobechanged)
-As they also pointed out in their work, we need to consider the
-neighborhood of $x$, so that the derivatives of the uncertain scalar
-field are Gaussian distributed as well. As we will explain in
-Chapter~\ref{chap:Method}, we will search for ridges
-(Section~\ref{sec:Ridges}) inside cells. Therefore, combining this with
-the need for neighboring points, we have 4 (or 8 in the 3D case) nodes
-of the cell we want to observe, together with their neighboring points
-in every dimension and, because we also want to calculate the second
-derivative, their neighboring nodes as well. Cleared from redundant
-points, this results in 24 (80) nodes per neighborhood as illustrated in
-Figure~\ref{fig:NH}. We can take this neighborhood as a vector $v_x$ and
-calculate the $24$-dimensional mean vector at point $x$ of the mean
-vector field $\mu(x) = \frac{1}{m} \sum_{k=1}^m v_{x,k}$, followed by
-the $24 \times 24$-dimensional covariance matrix, with the covariance
-field being $\Sigma(x)= \frac{1}{m} \sum_{k=1}^m (v_{x,k} -
-\mu(x)){(v_{x,k} - \mu{(x)})}^\top$. Therefore our uncertain scalar
-fields follows a multivariate Gaussian distribution at every location
-
-\begin{equation}
-  S_{\mathcal{N}}(x) = \mathcal{N}(\mu(x), \Sigma(x)).\\
-\end{equation}
-
-\begin{figure}
+\begin{figure}[ht]
   \centering
   \begin{subfigure}[b]{0.4\textwidth}
     \includegraphics[width=\textwidth]{Images/2DNH.pdf}
@@ -363,18 +345,62 @@ fields follows a multivariate Gaussian distribution at every location
   \label{fig:NH}
 \end{figure}
 
+\noindent for the $m$ entities at point $x = (x_1,\dots,x_n)$. This
+follows the work of Mathias Otto and Holger Theisel~\cite{Vortex},
+who searched for vortex core lines in uncertain vector fields. As vector
+fields have multiple values at each location, their uncertain field was
+a multivariate Gaussian distribution. They used Monte-Carlo methods to
+draw samples for a point and its four neighbors in 2-dimensional space
+and studied the distribution of the derivatives. We will explain how
+Monte-Carlo methods work in Section~\ref{sec:MGS}. Whereas the vectors
+were indeed normal distributed, the derivatives were not. As the
+derivatives play a vital role for the detection of vortex cores, just
+like for the detection of ridges, they needed the derivatives to follow
+the distribution of the sampled vectors. They solved this issue by
+considering the neighboring nodes of $x$ along each dimension for
+the distribution as well, to get a consistent estimation of the
+respective Jacobian. For the detection of ridges in scalar fields,
+we need the first and the second derivative. As we will explain in
+Chapter~\ref{chap:Method}, we decide on the presence of a ridge in
+a cell of the field. Therefore, we not only consider the point at
+the location $x$ we are inspecting, but also the nodes of the cell
+for which $x$ is the bottom left node. For all nodes of the cell we
+need the first and second derivative, thus we also consider all
+neighboring nodes of the cell, as well as their neighboring nodes, as we
+need their derivative for the second derivative of the cell nodes. We
+can take all the values from this considered neighborhood of $x$ and
+interpret them as a column vector $v_x$. A lot of points in this
+neighborhood influence each other, leading to an $80$-dimensional vector
+in the 3D case and an $24$-dimensional vector in the 2D case. Figure
+\ref{fig:NH} shows an illustration of the considered neighborhood for
+one point of the fields in either case. As $v$ is multidimensional, we
+now have a multivariate Gaussian distribution in our uncertain scalar
+field with the underlying mean vector field $\mu(x) = \frac{1}{m}
+\sum_{k=1}^m v_{x,k}$ and covariance matrix field $\Sigma(x)=
+\frac{1}{m} \sum_{k=1}^m (v_{x,k} - \mu(x)){(v_{x,k} - \mu{(x)})}^\top$
+and therefore
+
+\begin{equation}
+  S_{\mathcal{N}}(x) = \mathcal{N}(\mu(x), \Sigma(x)).
+\end{equation}
+
+From this distribution we will draw samples in Chapter~\ref{chap:Method}
+and calculate ridge criteria on them. To generate these samples, we
+need matrix decompositions of the covariance matrices, which we will
+explain in the next section.
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Matrix Decompositions}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-A matrix decomposition is a factorization of a matrix into its
-constituent parts. In general there are two classes of factorizations:
-decompositions used for solving linear equations and decompositions
-based on eigenvalues and vectors. We will consider one example from each
-class, namely the Cholesky and the Eigendecomposition. As we will
-explain in Section~\ref{sec:MGS} we will use both decompositions to
-generate samples from a multivariate gaussian distribution, even though
-they are from different classes.
+Our Monte-Carlo method used for sampling the uncertain scalar fields
+relies on the decomposition of the covariance matrix, defining the
+deviations of the members from the mean. A matrix decomposition is a
+factorization of a matrix into its constituent parts. In general there
+are two classes of factorizations: decompositions used for solving
+linear equations and decompositions based on eigenvalues and vectors. We
+will consider one example from each class, namely the Cholesky and the
+Eigendecomposition, as they are prominent representatives.
 
 %----------------------------------------------------------------------%
 \subsection{Cholesky Decomposition}\label{sec:cholesky}
@@ -382,23 +408,41 @@ they are from different classes.
 
 The Cholesky factorization is a decomposition of a square, hermititan,
 positive definite matrix $A$ into the product of a lower-triangular
-matrix L and its conjugate transpose $A = L L^*$. A matrix $C$ is
-hermitian if the diagonal elements are real valued and $C_{ij} =
-\overline{C}_{ji}$, meaning that $\overline{C}_{ji}$ is the complex
-conjugate of $C_{ij}$. Two complex numbers are complex conjugate if they
-have equal real and imaginary parts, but opposite signs. For example,
-$1+i \in \mathbb{C}$ is the complex conjugate of $1-i$. Following this
-property, the standard Cholesky decomposition is also applicable for
-every real valued, symmetric, positive definite matrix, resulting in a
-lower triangular real valued matrix and its transpose $A = L L^\top$. We
-will only deal with real valued matrices in this work and therefore
-follow this notation. A simple way to determine the definiteness of a
+matrix L and its conjugate transpose $A = L L^*$. A hermitian matrix is
+the complex counterpart to a real symmetric matrix. Two complex numbers
+are complex conjugate if they have equal real and imaginary parts, but
+opposite signs. For example, $1+i \in \mathbb{C}$ is the complex
+conjugate of $1-i$. A simple way to determine the definiteness of a
 matrix is to look at its eigenvalues. If every eigenvalue $\lambda$ of a
 square $n \times n$ matrix is greater than zero, $\lambda_{i} > 0, i \in
 \{1,\dots,n\}$, the matrix is positive definite. If every eigenvalue is
 greater or equal to zero, $\lambda_{i} \ge 0$, the matrix is positive
 semi-definite. The same goes for negative eigenvalues, as they make the
-matrix negative (semi-) definite.
+matrix negative (semi-) definite. Following this property, the standard
+Cholesky decomposition is also applicable for every real valued,
+symmetric, positive definite matrix, resulting in a lower triangular
+real valued matrix and its transpose $A = L L^\top$. We will only deal
+with real valued matrices in this work and therefore follow this
+notation. An example for the Cholesky decomposition of a simple matrix
+would be
+\begin{equation}\label{eq:chol}
+  \begin{pmatrix}
+    9 & 18 & -27\\
+    18 & 40 & -18 \\
+    -27 & -18 & 406
+  \end{pmatrix}
+  =
+  \begin{pmatrix}
+    3 & 0 & 0\\
+    6 & 2 & 0 \\
+    -9 & 18 & 1
+  \end{pmatrix}
+  \begin{pmatrix}
+    3 & 6 & -9\\
+    0 & 2 & 18 \\
+    0 & 0 & 1
+  \end{pmatrix}.
+\end{equation}
 
 %----------------------------------------------------------------------%
 \subsubsection{$LDL^T$ Decomposition}
@@ -407,68 +451,50 @@ matrix negative (semi-) definite.
 The closely related $LDL^T$ decomposition extends the classical Cholesky
 decomposition to semi-definite and negative definite matrices $A = L D
 L^\top$, where $L$ is a lower unitriangular matrix, meaning there are
-only ones on the diagonal, and $D$ is a diagonal matrix. The two
-decompositions are related as follows:
+ones on the diagonal instead of zeros, and $D$ is a diagonal matrix. The
+two decompositions are related as follows:
 
 \begin{equation}\label{eq:LDL}
-  A = LDL^\top = (L D^\frac{1}{2}) (D^\frac{1}{2}  L^\top).
+  A = LDL^\top = (L D^\frac{1}{2}) (D^\frac{1}{2}  L^\top),
 \end{equation}
 
-\noindent This version has the advantage that it avoids extracting
-square roots, thus allowing for negative entries in $D$, as it is
-possible for some indefinite matrices for which no classical
-decomposition exists, while having the same computational complexity as
-the Cholesky decomposition. If the solution of a linear system is needed
-and the system can be put into a symmetric form, the Cholesky
-decomposition and its variant is the method of choice, as it offers
-efficiency and usually numerical stability. Here is an example for both
-variants of the decomposition:\\
-\begin{inparaenum}[]
-  \item Cholesky decomposition of a symmetric real valued matrix
-  \begin{equation}
-    \begin{pmatrix}
-      9 & 18 & -27\\
-      18 & 40 & -18 \\
-      -27 & -18 & 406
-    \end{pmatrix}
-    =
-    \begin{pmatrix}
-      3 & 0 & 0\\
-      6 & 2 & 0 \\
-      -9 & 18 & 1
-    \end{pmatrix}
-    \begin{pmatrix}
-      3 & 6 & -9\\
-      0 & 2 & 18 \\
-      0 & 0 & 1
-    \end{pmatrix}
-  \end{equation}
-  \item $LDL^T$ decomposition of the same matrix
-  \begin{equation}
-    \begin{pmatrix}
-      9 & 18 & -27\\
-      18 & 40 & -18 \\
-      -27 & -18 & 406
-    \end{pmatrix}
-    =
-    \begin{pmatrix}
-      1 & 0 & 0\\
-      2 & 1 & 0 \\
-      -3 & 9 & 1
-    \end{pmatrix}
-    \begin{pmatrix}
-      9 & 0 & 0\\
-      0 & 4 & 0 \\
-      0 & 0 & 1
-    \end{pmatrix}
-    \begin{pmatrix}
-      1 & 2 & -3\\
-      0 & 1 & 9 \\
-      0 & 0 & 1
-    \end{pmatrix}
-    .
-  \end{equation}
-\end{inparaenum}
+\noindent with the matrix root of $D$. This version has the advantage
+that it avoids extracting square roots, thus allowing for negative
+entries in $D$, as it is possible for some indefinite matrices for which
+no classical decomposition exists. The $LDL^T$ decomposition still has
+the same computational complexity as the standard Cholesky
+decomposition. The $LDL^T$ decomposition of the matrix from Equation
+\ref{eq:chol} is
+
+\begin{equation}
+  \begin{pmatrix}
+    9 & 18 & -27\\
+    18 & 40 & -18 \\
+    -27 & -18 & 406
+  \end{pmatrix}
+  =
+  \begin{pmatrix}
+    1 & 0 & 0\\
+    2 & 1 & 0 \\
+    -3 & 9 & 1
+  \end{pmatrix}
+  \begin{pmatrix}
+    9 & 0 & 0\\
+    0 & 4 & 0 \\
+    0 & 0 & 1
+  \end{pmatrix}
+  \begin{pmatrix}
+    1 & 2 & -3\\
+    0 & 1 & 9 \\
+    0 & 0 & 1
+  \end{pmatrix}
+  .
+\end{equation}
+
+\noindent The Cholesky decomposition and its variant are a great way to
+solve linear equations, as the results for the variables can easily be
+seen for a triangular matrix. Also the implemented algorithms offer
+fast computation with complexity $\mathcal{O}(\frac{N^3}{3})$.
 
 %----------------------------------------------------------------------%
 \subsection{Eigendecomposition}\label{sec:eigen}
@@ -536,10 +562,13 @@ the eigenvalue matrix $\Lambda$ to that power:
   .
 \end{equation}
 
-\noindent In this work, our matrices don't need to be diagonizable, as
-this property is only required for the inverse of the eigenvector
-matrix. Section~\ref{sec:MGS} will give more information on that matter.
-
+\noindent For the Monte-Carlo sampling, our covariance matrices don't need
+to be diagonizable, as this property is only required for the inverse of
+the eigenvector matrix. Section~\ref{sec:MGS} will give more information
+on that matter. The Eigendecomposition plays a vital role in this work,
+as the eigenvectors give a lot of information about the decomposed matrix.
+The eigenvectors define major axes, like the direction of greatest change
+of the gradient, or the dimension with the most uncertainty.
 
 %----------------------------------------------------------------------%
 \subsubsection{Principal Component Analysis}
@@ -563,10 +592,14 @@ the PCA fits an $n$-dimensional ellipsoid around a set of possibly
 correlated points. The first principle component then corresponds to the
 axis of biggest magnitude of the ellipsoid and therefore the axis of the
 largest variance of the data. The principal components are always
-orthogonal to each other. When the Eigendecomposition is applied to
-a matrix containing correlated points, the resulting eigenvectors match
-the principal components, and the eigenvalues the variance along those
-axes. See Figure~\ref{fig:PCA} for a graphical example.
+orthogonal to each other. When the Eigendecomposition is applied to a
+matrix containing correlated points, the resulting eigenvectors match
+the principal components and the eigenvalues match the variance along
+those axes. The eigenvalues therefore give information about the shape
+of the domain. In the 2-dimensional case, if the eigenvalues are quite
+similar, the data is distributed in a round circle. If the eigenvalues
+differ in magnitude, the domain becomes an ellipse. See Figure
+\ref{fig:PCA} for a graphical example.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Box-Muller Transformation}\label{sec:BM}
@@ -574,8 +607,10 @@ axes. See Figure~\ref{fig:PCA} for a graphical example.
 
 The Box-Muller Transformation is a method to transform two uniformly
 distributed random numbers into two independent, standard, normally
-distributed random numbers. Let $U_1$ and $U_2$ be samples from the
-uniform distribution on the interval ($0$, $1$). Let $N_1$ and $N_2$ be:
+distributed random numbers. An example for a standard normal
+distribution can be seen in Figure~\ref{fig:gauss}. Let $U_1$ and $U_2$
+be samples from the uniform distribution on the interval ($0$, $1$). Let
+$N_1$ and $N_2$ be:
 
 \begin{align}
   &N_1 = \sqrt{-2 \ln{U_1}} \cos (2 \pi U_2) \\
@@ -585,82 +620,15 @@ uniform distribution on the interval ($0$, $1$). Let $N_1$ and $N_2$ be:
 \noindent Then $N_1$ and $N_2$ are independent random numbers with a
 standard normal distribution, meaning that their mean is $\mu = 0$ and
 standard deviation $\sigma = 1$. This transformation can be repeated to
-generate standard normal distributed vectors of arbitrary length.
+generate standard normal distributed vectors of arbitrary length. These
+vectors will be used for our multivariate Gaussian sampling, as we will
+scale them to fit our distributions in the uncertain scalar fields.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Ridges}\label{sec:Ridges}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-While the intuitive definition of a ridge would be a path along the
-crest of a mountain with terrain falling off on either side, we focus on
-a mathematical definition of ridges. In principal, a ridge is a local
-maximum of an $n$-dimensional function. The maximum of the
-$1$-dimensional function $f(x) = -x^2$ would be the $0$-dimensional
-point at $x=0$, the ridge point (Figure~\ref{fig:ridge1D}). When we add
-a dimension, the domain becomes a $2$-dimensional surface, and the ridge
-point expands into a $1$-dimensional ridge line
-(Figure~\ref{fig:ridge2D}). Adding another dimension turns the function
-domain into a $3$-dimensional volume and the ridge into a
-$2$-dimensional surface (Figure~\ref{fig:ridge3D}). In general, the
-ridge is an $n-k$-dimensional manifold in an $n$-dimensional space for
-$k=\{1, \dots, n\}$. This means that ridge points and lines also exist
-in $3$-dimensional domains for example. This work focuses on ridges in
-$2$ and $3$-dimensional domains.\\
-To calculate the maximum, we need to derive the function and search for
-the points where the derived function is $0$. The derived function
-$f'(x)=-2x$ has only one zero at $x=0$. Now we only know that we have
-found an extremum and need to check whether its a maximum or minimum by
-looking at the second derivative $f''(x)=-2$. As $-2 < 0$, we now know
-that the extremum is a maximum. The same principal is applicable for
-ridges in higher dimensions. Here the first derivative at point $x$, the
-gradient, lies in the subspace spanned by $n-k$ eigenvectors of the
-Hessian, the second derivative, if $x$ is on an $n-k$ dimensional ridge.
-In other words, the dot product of the gradient with the remaining $k$
-eigenvectors is $0$, as the dot product is the scalar projection of two
-vectors or a measurement for how much the gradient points into the
-direction of the eigenvector. Keep in mind that the gradient always
-points into the direction of greatest ascend. These eigenvectors
-therefore have to be orthogonal to the gradient and the corresponding
-eigenvalues have to be negative just like in the example above, as $x$
-is a maximum along the directions of the $k$ eigenvectors, thus falls
-off in their directions and only increases along the direction of the
-$n-k$ eigenvectors. Figure~(INSERT REF) explains this connection on a
-simple two dimensional example. The question remaining is how to decide
-which eigenvectors denote the ridge domain. Eberly~\cite{Eberly} and
-Lindeberg~\cite{Lindeberg} proposed two ways on how to sort the
-eigenvalues $\lambda_i$ in order to pick the right corresponding
-eigenvectors $\epsilon_i$:\\
-\begin{inparaenum}[]
-  \item Eberly
-  \begin{equation}\label{eq:Eberly}
-   \lambda_1 \leq \cdots \leq \lambda_n
-  \end{equation}
-  \item Lindeberg
-  \begin{equation}
-    \lvert \lambda_1 \rvert \geq \cdots \geq \lvert \lambda_n \rvert.
-  \end{equation}
-\end{inparaenum}
-\noindent Lindebergs method extracts a subset of the ridge features
-found by Eberly. Lindeberg discards a feature if there is along any
-eigenvector an upward bend, denoted by a positive eigenvalue, that is
-stronger than the downward bend along the $n-k$ eigenvectors found by
-Eberly. For the definition of Eberly, an upward bend along the ridge is
-irrelevant for its existence. This work will use Eberlys method and
-therefore the principle definition for the existence of an $n-k$
-dimensional ridge at point $x \in \real^n$ is:\\
-
-\begin{equation}\label{eq:ridgeDot}
-  \nabla S(x) \cdot \epsilon_1 = \cdots = \nabla S(x) \cdot \epsilon_{k} = 0
-\end{equation}
-\begin{equation}\label{eq:ridgeEV}
-  \lambda_k < 0
-\end{equation}
-
-\noindent The counterpart to ridges are valleys. These can be obtained
-by extracting ridges from the scalar field $-S(x)$ or by checking
-Equation~\ref{eq:ridgeDot} for the eigenvectors corresponding to the
-$k$ largest eigenvalues and $\lambda_k > 0$.
-\begin{figure}
+\begin{figure}[t]
   \begin{subfigure}[b]{0.33\textwidth}
     \includegraphics[width=\textwidth]{Images/func1D.png}
     \caption{$f(x)= -x^2$}
@@ -677,27 +645,163 @@ $k$ largest eigenvalues and $\lambda_k > 0$.
     \label{fig:ridge3D}
   \end{subfigure}
   \caption{Ridges of co-dimension one for the function $f(x)=-x^2$ with
-  increasing dimensionality.}
+  increasing dimensionality. The ridge dot (red) in~\subref{fig:ridge1D}
+  is at $x=0$. Adding a dimension in \subref{fig:ridge2D} gives the
+  function a line (black) for $x=0$ along $y$. The same happens if we add
+  more dimensions.}
 \end{figure}
+
+The focus of this work is the extraction of ridge features from
+uncertain scalar fields. In order to do that, we first need to
+understand what a ridge is in a certain setting. While the intuitive
+definition of a ridge would be a path along the crest of a mountain with
+terrain falling off on either side, we focus on a mathematical
+definition of ridges. In principal, a ridge is a local maximum of an
+$n$-dimensional function. For example, the maximum of the
+$1$-dimensional function $f(x) = -x^2$ would be the $0$-dimensional
+point at $x=0$, the ridge point (Figure~\ref{fig:ridge1D}). When we add
+a dimension to the function, the domain becomes a $2$-dimensional
+surface, and the ridge point expands into a $1$-dimensional ridge line
+(Figure \ref{fig:ridge2D}). Adding another dimension turns the function
+domain into a $3$-dimensional volume and the ridge into a 2-dimensional
+surface (Figure~\ref{fig:ridge3D}) and so on. In general, a ridge is a
+$k$-dimensional manifold in an $n$-dimensional space for $k=\{,
+\dots, n-1\}$. In other words, ridge points and lines also exist in
+$3$-dimensional domains for example. This work focuses on ridges in $2$
+and $3$-dimensional domains.\\
+\indent To calculate the maximum, we need to derive the function and
+search for the points where the derived function is $0$. The derived
+function $f'(x)=-2x$ has only one point for which the function equals
+zero at $x=0$. Now we only know that we have found a local extremum and
+need to check whether its a maximum or minimum by looking at the second
+derivative $f''(x)=-2$. As $-2 < 0$, we now know that the extremum is a
+maximum. The same principal is applicable for ridges in higher
+dimensions. The derivative of $f$ being zero tells us, that at this
+point there is no change along the one dimension of the function. As
+ridges are features of lower dimension than the scalar field, they are a
+maximum for the $n-k$ dimensions, and therefore have a derivative of $0$
+along those dimensions, but can still change into the directions of the
+other eigenvectors. Due to the higher dimensionality and therefore
+increasing complexity, ridges usually won't be aligned with the base
+axes of the scalar field and the dimension along which the maximum lies
+is unclear.\\
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.5\textwidth]{Images/ridgeEV.pdf}
+  \caption{Gradient (green) on a ridge line (red) in 2-dimensional space.
+  The gradient is orthogonal to the blue eigenvector and parallel to the
+  other eigenvector, which is aligned with the ridge. The eigenvalue
+  corresponding to the blue eigenvector has to be negative.}
+  \label{fig:ridgeEV}
+\end{figure}
+
+The eigenvectors of the Hessian matrix give us information about the
+change of the gradient along their directions. The eigenvectors
+represent the axis along which the gradient changes the most. In the
+2-dimensional case, we have two eigenvectors with which we can predict
+the change of the gradient in every possible direction. Now the dot
+product of the gradient and the eigenvector denotes the directional
+derivative. If the gradient is on an extremum like in
+Figure~\ref{fig:ridgeEV}, it is orthogonal to one eigenvector, as it
+only changes along the direction of the other eigenvector. For higher
+dimensions, the gradient lies in a subspace spanned by the other $k$
+eigenvectors which are not orthogonal to the gradient. For the extremum
+to be a ridge, the eigenvalue associated with the orthogonal eigenvector
+has to be negative, just like the second derivative of the 1-dimensional
+function. This is due the property of the gradient that it always points
+towards greatest ascend and therefore always towards the ridge. If we
+now step along the direction of the eigenvector, we step straight aways
+from the ridge in both ways. Therefore the gradient gets negatively
+scaled against the direction taken to still point towards the ridge. The
+question remaining is how to decide which eigenvectors denote the ridge
+domain. Eberly~\cite{Eberly} and Lindeberg~\cite{Lindeberg} proposed two
+ways on how to sort the eigenvalues $\lambda_i$ in order to pick the
+right corresponding eigenvectors $\epsilon_i$:\\
+\begin{inparaenum}[(a)]
+  \item Eberly
+  \begin{equation}\label{eq:Eberly}
+   \lambda_1 \leq \cdots \leq \lambda_n
+  \end{equation}
+  \item Lindeberg
+  \begin{equation}
+    \lvert \lambda_1 \rvert \geq \cdots \geq \lvert \lambda_n \rvert.
+  \end{equation}
+\end{inparaenum}
+\noindent Lindebergs method extracts a subset of the ridge features
+found by Eberly. Lindeberg discards a feature if along any eigenvector
+there is an upward bend, denoted by a positive eigenvalue, that is
+stronger than the downward bend along the $n-k$ eigenvectors found by
+Eberly. For the definition of Eberly, the strength of an upward bend
+along the ridge is irrelevant for its existence. As a significantly
+negative eigenvalue denotes a strong change along the direction of the
+eigenvector, Lindeberg requires the ridges to be sharper than Eberly.
+This work will build on Eberlys method and therefore the principle
+definition for the existence of a $k$ dimensional ridge at point $x
+\in \real^n$ is:\\
+
+\begin{equation}\label{eq:ridgeDot}
+  \nabla S(x) \cdot \epsilon_1 = \cdots = \nabla S(x) \cdot \epsilon_{n-k} = 0
+\end{equation}
+\begin{equation}\label{eq:ridgeEV}
+  \lambda_{n-k} < 0
+\end{equation}
+
+\noindent This is just an approximation, as ridges for example can have
+nonlinear shapes and we assume linearity for the interpolation of our
+data. Also we only estimate the derivatives with central differences,
+giving us linear transformations. The counterpart to ridges are valleys.
+These can be obtained by extracting ridges from the scalar field $-S(x)$
+or by checking Equation~\ref{eq:ridgeDot} for the eigenvectors
+corresponding to the $n-k$ largest eigenvalues and $\lambda_{n-k} > 0$.
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Marching Cubes}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-The Marching Cubes algorithm~\cite{MC} is a method to extract
-isosurfaces from 3-dimensional discrete scalar fields. It got its name
-due to the cell-wise extraction of the isosurface. The first step of the
-algorithm is to check whether the nodes of the examined cell are either
-below or above the desired isovalue. After that, a lookup table is
-consulted that gives information on which edges of the cell connect such
-two nodes. If every value is above or below the isovalue, the cell does
-not contain a surface. Now linear interpolation is used to find the
-location of the isosurface on the respective edges and the found points
-are vertices of a triangle mesh. Figure~\ref{fig:MCTable} shows the
-15 unique configurations for a surface in the cell, without
-rotated variants. The same principle is used for the two dimensional
-version, the Marching Squares algorithm. In that case the lookup table
-is a lot simpler, as there are only four edges to check.
+\begin{figure}
+  \centering
+  \includegraphics[width=0.5\textwidth]{Images/MC.pdf}
+  \caption{Marching Squares configuration for a ridge (red) inside a
+  2-dimensional cell. The orientation of the gradients (green) to the
+  minor eigenvector (blue) decides the sign assigned to the node.
+  Opposite signs for two nodes connected by an edge indicate a
+  possible ridge between them.}
+  \label{fig:MC}
+\end{figure}
+
+With the definitions from the last section, the search for a ridge of
+co-dimension one in a scalar field can be broken down to the extraction
+of an isovalue, as we are searching for the points where $\nabla S(x)
+\cdot \epsilon_1 = 0$. The Marching Cubes algorithm~\cite{MC} is a
+method to extract isosurfaces from 3-dimensional discrete scalar fields.
+It got its name due to the cell-wise extraction of the isosurface. As
+the minor eigenvector is always perpendicular to a possible ridge
+feature, the sign of its dot product with the gradient gives us
+information about their orientation to each other. A negative sign would
+mean they point in different directions, whereas a positive that they
+point in similar directions. As eigenvectors yield no natural
+orientation, we have to orient the eigenvectors at the nodes in the same
+direction for Marching Cubes to work consistently. We can achieve this
+by using the Principal Component Analysis on a matrix containing the
+minor eigenvectors of the cell nodes. We then check the dot product of
+the vectors with the major component and eigenvectors with a negative
+one get inverted. Now we get consistent results for the dot products and
+know that the gradient flipped between nodes with opposite signs.
+Figure~\ref{fig:MC} shows this relation for the 2-dimensional version of
+Marching Cubes, Marching Squares. With the signs for the nodes, a lookup
+table is consulted, giving information on which edges have an
+intersection of the isovalue. If every value is above or below the
+isovalue, the cell does not contain a feature. Now linear interpolation
+is used to find the location of the isosurface on the respective edges
+and the found points are used asvertices of a triangle mesh.
+Figure~\ref{fig:MCTable} shows the 15 unique configurations for a
+surface in the cell, without rotated variants. The lookup table of the
+Marching Squares version is a lot simpler, as there are only four nodes
+to check. We will only use Marching Cubes on cells sampled from our
+uncertain scalar fields and therefore call it Uncertain Marching Cubes
+(UMC).
 
 \begin{figure}
   \centering
@@ -711,6 +815,7 @@ is a lot simpler, as there are only four edges to check.
 \section{The Parallel Vectors Operator}\label{sec:PVO}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+(to be adjusted)
 When extracting ridge lines in three dimensions, one could check for the
 conditions of Equation~\ref{eq:ridgeDot} and~\ref{eq:ridgeEV}. This
 would require to extract two isolines simultaneously which is not
@@ -790,7 +895,7 @@ V$ and scale them such that their last component is $1$. This provides
 us with the local triangle coordinates $s$ and $t$ where the two fields
 are parallel. If $s+t \leq 1$ and $s$ and $t$ are both greather than
 zero, the point lies within the triangle and an extremum is found. With
-the triangle coordinates the Hessian at the point can be interpolated to
+the triangle coordinates, the Hessian at the point can be interpolated to
 check for $\lambda_2 < 0$ in the case of ridges or $\lambda_2 > 0$ for
 valleys. Alternatively the minor or major eigenvectors of the Hessian
 can be tested for parallelity, depending on the desired feature.
