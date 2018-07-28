@@ -799,8 +799,12 @@ and the found points are used asvertices of a triangle mesh.
 Figure~\ref{fig:MCTable} shows the 15 unique configurations for a
 surface in the cell, without rotated variants. The lookup table of the
 Marching Squares version is a lot simpler, as there are only four nodes
-to check. We will only use Marching Cubes on cells sampled from our
-uncertain scalar fields and therefore call it Uncertain Marching Cubes
+to check. We will use the Marching Cubes approach on cells sampled from
+our uncertain scalar fields to find the edges that contain a gradient
+orthogonal to his minor eigenvector. As denoting the exact location of the
+intersection at the edge is unimportant in the uncertain setting, we will
+not generate meshes and only interpolate the gradient and the Hessian at
+the intersection. Therefore, we will call it Uncertain Marching Cubes
 (UMC).
 
 \begin{figure}
@@ -816,19 +820,20 @@ uncertain scalar fields and therefore call it Uncertain Marching Cubes
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 (to be adjusted)
-When extracting ridge lines in three dimensions, one could check for the
-conditions of Equation~\ref{eq:ridgeDot} and~\ref{eq:ridgeEV}. This
-would require to extract two isolines simultaneously which is not
-possible with the classical Marching Cubes algorithm. Another way would
-be to check if the gradient $g$ is parallel to itself derived with the
-Hessian, $g || H g$, as this implies that the gradient only changes
-along its direction. Peikert and Roth proposed the Parallel Vectors
-Operator~\cite{PV} as a versatile tool to find the set of points where
-two vector fields are parallel. We will use their analytic solution for
-triangular faces, and therefore every face of a cell is split into two
-triangles. The vectors of the gradient field and their derivatives at
-the nodes of an examined triangle can be expressed as a function of
-local triangle coordinates $s$, $t$ and $u$ with $u$ set to $1$:
+For the extraction of ridges of co-dimension two, we cannot use the
+classical Marchig Cubes algorithm, as it would essentially require to
+extract two isovalues simultaneously for the orthogonality. For the
+3-dimensional case, due to the symmmetry of the Hessian, being
+orthogonal to two eigenvectors implies parallelity to the third.
+Therefore we only need to search for the points where the gradient is
+parallel to its major eigenvector, $g||\epsilon_3$. Peikert and Roth
+proposed the Parallel Vectors Operator~\cite{PV} as a versatile tool to
+find the set of points where two vector fields are parallel. We will use
+their analytic solution for triangular faces, and therefore every face
+of a cell is split into two triangles. The vectors of the gradient field
+and their derivatives at the nodes of an examined triangle can be
+expressed as a function of local triangle coordinates $s$, $t$ and $u$
+with $u$ set to $1$:
 \begin{equation}
   g = V
   \begin{pmatrix}
@@ -838,7 +843,7 @@ local triangle coordinates $s$, $t$ and $u$ with $u$ set to $1$:
   \end{pmatrix}
 \end{equation}
 \begin{equation}
-  H g = W
+  \epsilon_3 = W
   \begin{pmatrix}
     s\\
     t\\
@@ -896,6 +901,7 @@ us with the local triangle coordinates $s$ and $t$ where the two fields
 are parallel. If $s+t \leq 1$ and $s$ and $t$ are both greather than
 zero, the point lies within the triangle and an extremum is found. With
 the triangle coordinates, the Hessian at the point can be interpolated to
-check for $\lambda_2 < 0$ in the case of ridges or $\lambda_2 > 0$ for
-valleys. Alternatively the minor or major eigenvectors of the Hessian
-can be tested for parallelity, depending on the desired feature.
+check for $\lambda_2 < 0$. The same is applicable for valleys with
+parallelity of the gradient to the minor eigenvector and $\lambda_2 > 0$.
+At the end, the found points for a certain case are connected to form a
+line.
