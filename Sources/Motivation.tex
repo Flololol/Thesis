@@ -30,6 +30,17 @@ the quantity of uncertainty at a location. With increasing member size,
 the image becomes cluttered, but high frequency areas are not
 necessarily easy to see and the visualization can not be considered
 accurate without indications for error, accuracy of confidence.\\
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=0.75\textwidth]{Images/unccores.png}
+    \caption{Uncertain vortex core lines for the full set of correlated
+    flow fields. Region with probability reaching $100\%$ at the bottom,
+    where the core lines originate. The individual lines originate from
+    minor changes of the general direction and radius. As the line expands
+    upwards, these changes become more and more visible, leading to an
+    increasind spread of the uncertain visualization.}
+    \label{fig:UVC}
+\end{figure}
 \indent This was until 2012 Mathias Otto und Holger Theisel presented
 their approach for extracting probabilities for the existence of a
 vortex core line in a cell. They were the first to expand the
@@ -45,7 +56,7 @@ line in that cell. Figure~\ref{fig:UVC} shows the result of the
 uncertain vortex calculation for the whole set of vector fields from
 Figure~\ref{fig:spaghetti}. The set is very uncertain. As the vortices
 all have a similar base and start to deviate upwards, there are red
-region with high probability at the bottom. From there on up, the lines
+regions with high probability at the bottom. From there on up, the lines
 spread and therefore there are wider regions with low probability. This
 directly highlights common regions of the individual members and eases
 the understanding of the uncertainty in the fields.\\
@@ -65,17 +76,6 @@ variant of the Marching Cubes algorithm would give us an approximation
 of the uncertain ridge surface, but this method has some problems,
 especially at volatile locations of the fields, where the ridge of the
 individual members is already weak. The next chapter will give detailed
-information on the problems coming with Uncertain Marching Cubes and how
+information on the issues coming with Uncertain Marching Cubes and how
 we tried to overcome them.
 
-\begin{figure}[t]
-    \centering
-    \includegraphics[width=0.75\textwidth]{Images/unccores.png}
-    \caption{Uncertain vortex core lines for the full set of correlated
-    flow fields. Region with probability reaching $100\%$ at the bottom,
-    where the core lines originate. The individual lines originate from
-    minor changes of the general direction and radius. As the line expands
-    upwards, these changes become more and more visible, leading to an
-    increasind spread of the uncertain visualization.}
-    \label{fig:UVC}
-\end{figure}

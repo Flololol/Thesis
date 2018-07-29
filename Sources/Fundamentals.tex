@@ -755,12 +755,11 @@ These can be obtained by extracting ridges from the scalar field $-S(x)$
 or by checking Equation~\ref{eq:ridgeDot} for the eigenvectors
 corresponding to the $n-k$ largest eigenvalues and $\lambda_{n-k} > 0$.
 
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Marching Cubes}
+\section{Ridge Extraction}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\begin{figure}
+\begin{figure}[t]
   \centering
   \includegraphics[width=0.5\textwidth]{Images/MC.pdf}
   \caption{Marching Squares configuration for a ridge (red) inside a
@@ -769,6 +768,30 @@ corresponding to the $n-k$ largest eigenvalues and $\lambda_{n-k} > 0$.
   Opposite signs for two nodes connected by an edge indicate a
   possible ridge between them.}
   \label{fig:MC}
+\end{figure}
+
+While the last section talked about the formal definitions of ridges,
+invariably exact results in discrete scalar fields are unrealistic.
+Ridges can have nonlinear shapes and for example be curved inside a
+cell. With the assumption of linear interpolation, this can cause loss
+of possible ridge features. With different algorithms we can still try
+to estimate the ridge as best as possible. For the certain extraction of
+ridge surfaces in 3D and ridge lines in 2D, an approach using the
+Marching Cubes algorithm is the usual way to approximate the ridge. For
+ridge lines in 3D, the Parallel Vectors operator is used to find the
+ridges. We will explain both and how we use them in our uncertain
+context.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Uncertain Marching Cubes}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.5\textwidth]{Images/MCTable.pdf}
+  \caption{Unique triangulations of the cubes according to Lorensen and
+  Cline. Image from the original Marching Cubes publication~\cite{MC}.}
+  \label{fig:MCTable}
 \end{figure}
 
 With the definitions from the last section, the search for a ridge of
@@ -807,19 +830,10 @@ not generate meshes and only interpolate the gradient and the Hessian at
 the intersection. Therefore, we will call it Uncertain Marching Cubes
 (UMC).
 
-\begin{figure}
-  \centering
-  \includegraphics[width=0.6\textwidth]{Images/MCTable.pdf}
-  \caption{Unique triangulations of the cubes according to Lorensen and
-  Cline. Image from the original Marching Cubes publication~\cite{MC}.}
-  \label{fig:MCTable}
-\end{figure}
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{The Parallel Vectors Operator}\label{sec:PVO}
+\subsection{The Parallel Vectors Operator}\label{sec:PVO}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-(to be adjusted)
 For the extraction of ridges of co-dimension two, we cannot use the
 classical Marchig Cubes algorithm, as it would essentially require to
 extract two isovalues simultaneously for the orthogonality. For the
@@ -827,7 +841,7 @@ extract two isovalues simultaneously for the orthogonality. For the
 orthogonal to two eigenvectors implies parallelity to the third.
 Therefore we only need to search for the points where the gradient is
 parallel to its major eigenvector, $g||\epsilon_3$. Peikert and Roth
-proposed the Parallel Vectors Operator~\cite{PV} as a versatile tool to
+proposed the Parallel Vectors operator~\cite{PV} as a versatile tool to
 find the set of points where two vector fields are parallel. We will use
 their analytic solution for triangular faces, and therefore every face
 of a cell is split into two triangles. The vectors of the gradient field
