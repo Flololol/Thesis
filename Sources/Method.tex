@@ -18,12 +18,12 @@ information about their change along the dimensions outside the cell.\\
     \centering
     \begin{subfigure}{0.49\textwidth}
         \includegraphics[width=\textwidth]{Images/uncvelocity.png}
-        \caption{uncertain velocity}
+        \caption{Uncertain velocity}
         \label{fig:uncvel}
     \end{subfigure}
     \begin{subfigure}{0.49\textwidth}
         \includegraphics[width=\textwidth]{Images/uncacceleration.png}
-        \caption{uncertain acceleration}
+        \caption{Uncertain acceleration}
         \label{fig:uncacc}
     \end{subfigure}
     \caption{\subref{fig:uncvel} Distribution of velocity vectors of a
@@ -159,15 +159,15 @@ considered to contain a ridge. This would directly follow the work of
 Theisel \etal{} and therefore we will not go too much into detail. See
 Chapter~\ref{chap:Eval} for results of the uncertain ridge line
 calculation in 3 dimensions.\\
-\begin{figure}
+\begin{figure}[ht]
     \begin{subfigure}[b]{0.49\textwidth}
         \includegraphics[width=\textwidth]{Images/gradient.png}
-        \caption{}
+        \caption{Scalar field}
         \label{fig:gradient}
     \end{subfigure}
     \begin{subfigure}[b]{0.49\textwidth}
         \includegraphics[width=\textwidth]{Images/samples.png}
-        \caption{}
+        \caption{Samples}
         \label{fig:samples}
     \end{subfigure}
     \caption{\subref{fig:gradient} Gradients (green) in the field
@@ -229,16 +229,16 @@ of where the ridge actually is.\\
 \begin{figure}[t]
     \begin{subfigure}[b]{0.49\textwidth}
         \includegraphics[trim=0 350 0 300, clip=true, width=\textwidth]{Images/sfield.png}
-        \caption{scalar field}
+        \caption{Scalar field}
         \label{fig:sfield}
     \end{subfigure}
     \begin{subfigure}[b]{0.49\textwidth}
-        \includegraphics[trim=0 380 0 380, clip=true, width=\textwidth]{Images/ridge.png}
-        \caption{ridge surface}
+        \includegraphics[trim=0 350 0 300, clip=true, width=\textwidth]{Images/ridge.png}
+        \caption{Ridge surface}
         \label{fig:certainRidge}
     \end{subfigure}
     \caption{Ridge surface of the scalar field for the function
-    $f(x,y,z)=\cos(x)+\cos(y) +\cos(z)$ with $x,y,z \in (0, 4\pi)$. The
+    $f(x,y,z)=\cos(x)+\cos(y) +\cos(z)$ with $x,y,z \in [0, 4\pi]$. The
     functions are periodic and therefore the ridges are symmetric. The
     z-axis is squished, even though it has the same data range as the
     other axes to ease the spatial understanding of the domain.}
@@ -266,7 +266,7 @@ to be smaller than $t=0.05$. The resulting surface is shown in
 Figure~\ref{fig:MCridge}.
 \begin{figure}
     \centering
-    \includegraphics[trim= 0 300 0 300, clip=true, width=0.5\textwidth]{Images/weakridge.png}
+    \includegraphics[trim= 0 300 0 305, clip=true, width=0.65\textwidth]{Images/weakridge.png}
     \caption{Gradients (green) and their minor eigenvectors (blue) close to
     a ridge at a volatile point. This is a sideview of a location where the
     holes from Figure~\ref{fig:MCridges} appear. Here, the gradient is almost
@@ -284,14 +284,14 @@ changes of the ridge, which causes them to drastically change
 orientation when sampled. If we now increase the tolerance to try to
 fill these holes, we pick up a lot of undesired features. For $t=0.25$
 (Figure~\ref{fig:MCridgetol}) the holes are still visible, but already a
-lot of false positives clutter the view. For $t=0.5$
-(Figure~\ref{fig:MCridgetop}) the holes are barely visible in the broad
+lot of false positives clutter the view. For $t=0.5$ (see
+Figure~\ref{fig:MCridgetop}) the holes are barely visible in the broad
 noise on the surface, but the smaller surfaces on top and bottom are
 hard to distinguish from the surrounding false positives. This brings in
 the need for an approximate ridge criterion that adapts to local
 properties of the field, without being too restrictive or forgiving.
 
-\begin{figure}[ht]
+\begin{figure}[]
     \centering
     \begin{subfigure}[]{0.7\textwidth}
         \includegraphics[trim=0 350 0 300, clip=true, width=\textwidth]{Images/MCridge.png}
@@ -308,14 +308,15 @@ properties of the field, without being too restrictive or forgiving.
         \caption{$t=0.5$}
         \label{fig:MCridgetop}
     \end{subfigure}
-    \caption{Uncertain ridge surfaces from the Marching Cubes algorithm
-    for different tolerances for the dot product of the gradient and the
-    minor eigenvector. For $t=0.05$ the big surface along $z$ has holes
-    at the points where the ridge is weak and some undesired features at
-    the edges of the upper and lower surfaces. As we increase the
-    tolerance, the holes become smaller, but a lot more false positives
-    occur. Figure~\subref{fig:MCridgetop} offers a top down view on the
-    domain for $t=0.5$, as there is a lot of cluttering on the sides.}
+    \caption{Uncertain ridge surfaces from the Uncertain Marching Cubes
+    algorithm for different tolerances for the dot product of the
+    gradient and the minor eigenvector. For $t=0.05$ the big surface
+    along $z$ has holes at the points where the ridge is weak and some
+    undesired features at the edges of the upper and lower surfaces. As
+    we increase the tolerance, the holes become smaller, but a lot more
+    false positives occur. Figure~\subref{fig:MCridgetop} offers a top
+    down view on the domain for $t=0.5$, as there is a lot of cluttering
+    on the sides.}
     \label{fig:MCridges}
 \end{figure}
 
@@ -366,7 +367,7 @@ product becomes smaller moving along $\epsilon_1$. Now $\lambda_1$ gives
 us an estimate of the change for a given distance $d$ along
 $\epsilon_1$, as it is the directional derivative of the gradient.
 Therefore we know, that if
-\begin{figure}[ht]
+\begin{figure}[]
     \centering
     \includegraphics[trim=0 40 0 50, clip=true, width=0.4\textwidth]{Images/criterion.pdf}
     \caption{Illustration of gradients (green) close to a ridge line
@@ -391,18 +392,19 @@ Therefore we know, that if
 is true, we passed a ridge somewhere in the distance $d$, as the
 negative change of the gradient is greater than its extend into that
 direction, implying that it flipped. Equation~\ref{eq:criterion} is our
-new criterion for the existence of a ridge close to a node. This
-principle is applicable for all ridges of co-dimension one. Back to our
-uncertain ridge surface extraction, a suitable value for $d$ could now
-be the average distance of two nodes in $x, y$ and $z$ dimension, as we
-are inspecting one cell at a time, but in theory, $d$ can be adjusted to
-estimate over larger distances. We apply Equation~\ref{eq:criterion} to
-every node of our sampled cell and the probability for the existence of
-a ridge line inside this cell is then the relative frequency of nodes
-for which the equation states true, e.g.\, if it is true for 4 out of 8
-nodes, the probability is $50\%$. The probability for each sample is
-summed up and divided by the total number of samples to get the final
-probability for the existence of a ridge in that cell.\\
+new criterion for the existence of a ridge close to a node, which we
+will call Ridge Estimation. This principle is applicable for all ridges
+of co-dimension one. Back to our uncertain ridge surface extraction, a
+suitable value for $d$ could now be the average distance of two nodes in
+$x, y$ and $z$ dimension, as we are inspecting one cell at a time, but
+in theory, $d$ can be adjusted to estimate over larger distances. We
+apply Equation~\ref{eq:criterion} to every node of our sampled cell and
+the probability for the existence of a ridge line inside this cell is
+then the relative frequency of nodes for which the equation states true,
+e.g.\, if it is true for 4 out of 8 nodes, the probability is $50\%$.
+The probability for each sample is summed up and divided by the total
+number of samples to get the final probability for the existence of a
+ridge in that cell.\\
 \indent Figure~\ref{fig:newmethod} shows the volume visualization for
 the probabilities of the uncertain ridge calculation on the previous
 data set using our new criterion. As you can see, the new method closed
@@ -415,7 +417,7 @@ always having parts of their ridge at this location. A detailed analysis
 of the difference of the methods is provided in Section
 \ref{sec:evalExtr}.
 
-\begin{figure}[t]
+\begin{figure}[]
     \centering
     \includegraphics[trim=0 350 0 300, clip=true, width=0.7\textwidth]{Images/lowuncnew.png}
     \caption{Uncertain ridge surface for the set of shifted scalar

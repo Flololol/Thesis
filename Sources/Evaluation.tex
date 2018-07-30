@@ -3,10 +3,13 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 This chapter will evaluate the results obtained with our new criterion,
-compare them with the conventional method, as well as show its vantages
-and disadvantages. But at first, we will talk about the differences of
-the matrix decompositions used to generate the samples from the
-multivariate distributions.
+compare them with the conventional method, as well as show the
+weaknesses of the method. But at first, we will talk about the
+differences of the matrix decompositions used to generate the samples
+from the multivariate distributions. For most results, we had to take
+synthetic data sets, as it is quite difficult to obtain correlated
+data specifically for our purpose. The chosen examples should still
+help to understand the matter as best as possible.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Comparison of Matrix Decompositions}\label{sec:evalMD}
@@ -20,7 +23,7 @@ like ``Random Number Generation and Monte Carlo Methods''~\cite{Monte}
 state, that any decomposition that achieves such a factorization is
 suitable for the genration of random samples and delivers equally
 good results. Therefore one could prefer the Cholesky decomposition
-because of its faster computation time $\mathcal{O}(N^3/3)$ over
+because of its faster computation time $\mathcal{O}(\frac{N^3}{3})$ over
 the Eigendecomposition with $\mathcal{O}(N^3)$. To compare the two
 decompositions, we take the function from Figure~\ref{fig:sfield} and
 equally shift it along the $x$-dimension to create a set of twenty
@@ -149,8 +152,7 @@ high variance of the data set, the members seem to lose their
 correlation. The downside is, that this case is not the usual thing for
 real world data, where we try to extract ridge structures from similar
 scalar fields. 
-
-\begin{figure}[t]
+\begin{figure}[]
     \begin{subfigure}[b]{0.49\textwidth}
         \includegraphics[trim=0 350 0 300, clip=true, width=\textwidth]{Images/shiftXold.png}
         \caption{Eigendecomposition}
@@ -167,7 +169,6 @@ scalar fields.
     of the vectors.}
     \label{fig:MCcomp}
 \end{figure}
-
 \begin{figure}
     \begin{subfigure}[b]{0.49\textwidth}
         \includegraphics[trim=0 350 0 300, clip=true, width=\textwidth]{Images/highuncEigen.png}
@@ -196,10 +197,12 @@ scalar fields.
 After the differences of the decompositions are explained in detail, we
 can proceed to evaluate the different approaches for the ridge
 extraction. At first we will compare the new criterion to the extraction
-with Uncertain Marching Cubes.
+with Uncertain Marching Cubes and talk about the advantages and
+disadvantages. Later we will have some results for the extraction of
+ridge lines in 3D.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Uncertain Marching Cubes or Ridge Estimation}\label{sec:evalMeth}
+\subsubsection{Ridges of Co-Dimension One}\label{sec:evalMeth}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{figure}
@@ -216,29 +219,189 @@ with Uncertain Marching Cubes.
     \caption{Side view of the two extraction methods on a data set with
     no variance. \subref{fig:UMCside} UMC is creating a ridge surface
     with $100\%$ confidence for the thickness of one cell, surrounded by
-    another layer of lower probability due to the tolerance for the dot
-    product. \subref{fig:REside} Ridge Estimation with the average cell
-    distance as $d$, offers a high confidence for 2 to 3 layers of cells
-    and still has another layer with lower probability padding it.}
+    another layer of lower probability due to the tolerance $t=0.1$ for
+    the dot product. \subref{fig:REside} Ridge Estimation with the
+    average cell distance as $d$, offers a high confidence for 2 to 3
+    layers of cells and still has another layer with lower probability
+    padding it. The color difference of the upper and lower surfaces is
+    due to the volume visualization of multiple high value cells in a
+    row in \subref{fig:REside}.}
+    \label{fig:ridgeSide}
 \end{figure}
 
+When comparing Uncertain Marching Cubes (UMC) to Ridge Estimation (RE),
+the first apparent difference is the wider detection area around a ridge
+for RE, as visible in Figure~\ref{fig:ridgeSide}. The areas with very
+high probability in the center of the ridges are about 2 to 3 cells
+thick. This is due to the estimation distance $d$, being the average
+distance of two nodes in every dimension for this example. For gradients
+close to a ridge, which are already almost parallel to the ridge,
+Equation \ref{eq:criterion} is easily fulfilled. UMC on the other hand
+deliveres full confidence only for one layer of cells. Due to the
+tolerance $t=0.1$, adjacent cells get highlighted as well. This brings
+us to the core difference. While the conventional approach would deliver
+very certain results, Ridge Estimation gives a probability for how much
+the cell was how close to a ridge over the individual members of the
+ensemble.\\
+\indent Our uncertain fields used in Section~\ref{sec:ridgeextract}
+are generated by shifting the whole domain, yielding very little
+accordance. Therefore one could argue, that the volatile regions of the
+surface are indeed uncertain and therefore the holes of UMC have their
+legitimacy. Real world data from simulations for example would have high
+probabilities, where all the members of an ensemble have ridges and less
+confident parts, where the distribution differs. Ridge Estimation would
+give these locations higher probabilities, as long as the overall
+structure of the ridge is similar over the members. Therefore RE can be
+used to get a common shape, shared by the members at any location. The
+thickness of the ridge can be adjusted with the $d$ parameter,
+eventually delivering better results, but further investigation is
+needed for the optimal value. RE still deliveres good results for data
+sets with more congruence, but the additional detections have to be
+understood to interpret the volume. If precise results for a set with a
+lot of similarities are needed, UMC might be preferred.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Ridge Lines in 3D}\label{sec:evalRL}
+\subsubsection{Ridge Lines in 3D}\label{sec:evalRL3D}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+As mentioned before, we can also extract ridge lines from our uncertain
+scalar fields. As the Parallel Vectors operator is a quite precise
+method, it suffers from the same problems as Uncertain Marching Cubes.
+Therefore little uncertainty can already yield incomplite ridge
+detections, if the data is distributed in a certain way.\\
+\indent Figure~\ref{fig:doublegyre} shows the extracted ridge lines from
+a simualated time-dependent double gyre field with varying parameters.
+The parameters determine the amplitude of the flow and its position. The
+members got slightly changed, resulting in fields with a main ridge in
+the middle moving from side to side. Weaker ridge lines are in the
+corners of the domain. We applied a filter for $\lambda_2$, requiring
+the eigenvalue to be smaller than $0.7$ to isolate the main ridge, 
+resulting in Figure~\ref{fig:dgfiltered}-
 
 \begin{figure}
     \begin{subfigure}{0.33\textwidth}
-        \includegraphics[trim=200 0 350 0, clip=true, width=\textwidth]{Images/dgyre.png}
-        \caption{double gyre}
+        \includegraphics[trim=200 0 200 0, clip=true, width=\textwidth]{Images/dgyre.png}
+        \caption{Double gyre}
+        \label{fig:dgfield}
     \end{subfigure}
     \begin{subfigure}{0.33\textwidth}
         \includegraphics[trim=200 0 200 0, clip=true, width=\textwidth]{Images/RL3D.png}
-        \caption{raw lines}
+        \caption{Raw lines}
+        \label{fig:dgrawlines}
     \end{subfigure}
     \begin{subfigure}{0.33\textwidth}
         \includegraphics[trim=200 0 200 0, clip=true, width=\textwidth]{Images/RL3Dfilt.png}
-        \caption{filtered for $\lambda_2 > 0.7$.}
+        \caption{Filtered for $\lambda_2 < -0.7$}
+        \label{fig:dgfiltered}
     \end{subfigure}
-    \caption{Uncertain ridge line calculation for double gyre domain.}
+    \caption{Uncertain ridge line calculation for double gyre domain,
+    modeling change of flow over time. \subref{fig:dgfield} Volume
+    visualization of the domain from which the lines will be extracted.
+    Over time, the position of the main flow moves from left to right
+    and back, indicated by the lighter areas. The data set consists of
+    multiple simulations of the domain with slightly adjusted parameters.
+    \subref{fig:dgrawlines} Raw ridge lines over the members. The ridge
+    lines at the borders of the field are distorted and artifacts are
+    visible on the main ridge in the middle. \subref{fig:dgfiltered}
+    Ridges filtered for $\lambda_2 < -0.7$. The smaller ridges on the
+    side disappeared, only leaving the main ridge. The main ridge
+    shows gaps along its line.}
+    \label{fig:doublegyre}
 \end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Isotropy}\label{sec:iso}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.5\textwidth]{Images/iso.png}
+    \caption{Gradients (green) around a ridge point (red) in an isotropic
+    domain. The minor eigenvectors (blue) are orthogonal to their
+    gradients for every point, implying the existence of a ridge line.}
+    \label{fig:iso}
+\end{figure}
+
+A common problem of the extraction of $k$-dimensional ridges are areas,
+where the presence of a ridge feature of lower dimensionality is
+stronger than the one extracted. For example a ridge point in a
+2-dimensional domain with perfect isotropy. Here, the gradient falls off
+equally in either direction of the ridge feature, as the point is a
+maximum along every possible direction, causing the gradient to be
+almost orthogonal to its minor eigenvector in the whole area. The
+gradients and their eigenvectors around a perfect ridge point are
+pictured in Figure~\ref{fig:iso}. The gradients all point towards the
+ridge point in the middle and don't change in any other direction. The
+criterion of a ridge line is fulfilled, theoretically yielding a ridge
+for the whole isotropic domain. The correct representation would only be
+the point in the middle.\\
+\indent Both extraction methods suffer from this problem. Figure
+\ref{fig:isoEx} shows the result of the two approaches for a 3-dimensional
+domain, which becomes more and more isotrope. At first, the results are
+flat surfaces, but with increasing isotropy, the volumes become more
+narrow until we have detections all around the perfect isotropic line.
+Ridge Estimation in Figure~\ref{fig:isoRE} deliveres a full volume
+all around the isotropic place, whereas Uncertain Marching Cubes still
+yields some structures, due to the requirement of a change of sign
+of the dot products at the cell nodes. With a higher requirement
+for the eigenvalue, we can filter the size of the false detections,
+but it will never become the line it should be.\\
+\indent For real world data, perfect isotropy is rarely the case, but
+for false detection caused by this, local areas which simulate isotropy
+are still possible. In the future, this could be challenged by a filter,
+deciding which dimension of ridge is dominant. This can be seen from the
+eigenvalues at the respective cells, as $\lambda_2$ becomes similarly
+negative to $\lambda_1$ at a ridge line in 3D. This should be a
+consideration for future work.
+
+\begin{figure}[]
+    \begin{subfigure}{0.49\textwidth}
+        \includegraphics[trim= 0 200 0 200, clip=true, width=\textwidth]{Images/isoRE.png}
+        \caption{Ridge Estimation}
+        \label{fig:isoRE}
+    \end{subfigure}
+    \begin{subfigure}{0.49\textwidth}
+        \includegraphics[trim= 0 200 0 200, clip=true, width=\textwidth]{Images/isoUMC.png}
+        \caption{Uncertain Marching Cubes}
+        \label{fig:isoUMC}
+    \end{subfigure}
+    \caption{Comparison of the two approaches for an increasingly
+    isotropic domain. \subref{fig:isoRE} Full confidence for every cell
+    at perfect isotropy, leading to a volume around the correct ridge
+    line with Ridge Estimation. \subref{fig:isoUMC} Similar issue for
+    the Uncertain Marching Cubes algorithm, delivering false surfaces
+    around the line. The size of the detected area can be minimized
+    by filtering for higher eigenvalues.}
+    \label{fig:isoEx}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Aliasing}\label{sec:alias}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{figure}
+    \centering
+    \includegraphics[trim= 0 250 0 250, clip=true, width=0.5\textwidth]{Images/aliasing.png}
+    \caption{Aliasing of the ridge surface in a low resolution scalar
+    field. The faces yield steps, while they should be a smooth, flat
+    surfaces. Supersampling is only rational for a limited amount, as it
+    destroys information.}
+    \label{fig:alias}
+\end{figure}
+
+Due to the cell wise extraction of the features, the minimum detection
+is a whole cell. If the data sets offer low resolution, this can become
+an issue. Figure~\ref{fig:alias} shows the surface for a ridge lying
+aslant to the axes in a domain with low resolution. The surface becomes
+blocky and the exact position of the ridge is hard to determine. This is
+an issue for both extraction methods. Supersampling the domain is a
+limited solution for this problem, as due to the interpolation a lot of
+information is lost. The values inbetween the known locations will yield
+little change, further aggravating the ridge calculation. Another
+solution might be the pointwise implementation of Ridge Estimation,
+together with a smaller value for $d$. This would smoothen the results,
+as only close nodes get highlighted, instead of close cells. Also the
+computational complexity would drop considerably, as the neighborhood,
+that needs to be sampled for a single point, is fundamentally smaller.
+This would also help the numerical issues coming with the Decompositions
+of larger matrices.

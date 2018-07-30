@@ -37,27 +37,27 @@ of this axis.
 \begin{figure}
   \begin{subfigure}[b]{0.19\textwidth}
     \includegraphics[width=\textwidth]{Images/scattered.pdf}
-    \caption{scattered}
+    \caption{Scattered}
     \label{fig:scattered}
   \end{subfigure}
   \begin{subfigure}[b]{0.2\textwidth}
     \includegraphics[width=\textwidth]{Images/unstructured.pdf}
-    \caption{unstructured}
+    \caption{Unstructured}
     \label{fig:unstructured}
   \end{subfigure}
   \begin{subfigure}[b]{0.2\textwidth}
     \includegraphics[width=\textwidth]{Images/uniform.pdf}
-    \caption{uniform}
+    \caption{Uniform}
     \label{fig:uniform}
   \end{subfigure}
   \begin{subfigure}[b]{0.2\textwidth}
     \includegraphics[width=\textwidth]{Images/rectilinear.pdf}
-    \caption{rectilinear}
+    \caption{Rectilinear}
     \label{fig:rectilinear}
   \end{subfigure}
   \begin{subfigure}[b]{0.19\textwidth}
     \includegraphics[width=\textwidth]{Images/curvilinear.pdf}
-    \caption{curvilinear}
+    \caption{Curvilinear}
     \label{fig:curvilinear}
   \end{subfigure}
   \caption{Different types of grids. Uniform structured grids like in
@@ -89,16 +89,16 @@ An $n$-dimensional field with a single scalar value at every point in
 space is called a scalar field. A simple example for a scalar field is a
 height map of some geographical terrain. It has two dimensions with a
 height value at every point, usually encoded with color (Figure
-\ref{fig:HM}). In this work we will use the notation $S(x)$ for the
-scalar value at point $\text{x} = (x_1,\dots,x_n)$ in the scalar field $S$ with
-$S: \real^n \rightarrow \real$. While in continuous scalar fields the
-value of every point is defined by a function, discrete scalar fields
-only have values at specific points in space. As real world data is
-often acquired by measuring certain locations and usually does not
-follow any graspable function, we will focus on uniformly structured
-discrete scalar fields in this work, where $n \in \{2,3\}$. This also
-applies to the other types of fields we will encounter, because they
-have the same resolution as the scalar field.
+\ref{fig:HM}). In this work we will use the notation $S(\boldsymbol{x})$
+for the scalar value at point $\boldsymbol{x} = (x_1,\dots,x_n)$ in the
+scalar field $S$ with $S: \real^n \rightarrow \real$. While in
+continuous scalar fields the value of every point is defined by a
+function, discrete scalar fields only have values at specific points in
+space. As real world data is often acquired by measuring certain
+locations and usually does not follow any graspable function, we will
+focus on uniformly structured discrete scalar fields in this work, where
+$n \in \{2,3\}$. This also applies to the other types of fields we will
+encounter, because they have the same resolution as the scalar field.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Vector Fields}
@@ -648,7 +648,8 @@ scale them to fit our distributions in the uncertain scalar fields.
   increasing dimensionality. The ridge dot (red) in~\subref{fig:ridge1D}
   is at $x=0$. Adding a dimension in \subref{fig:ridge2D} gives the
   function a line (black) for $x=0$ along $y$. The same happens if we add
-  more dimensions.}
+  more dimensions. In \subref{fig:ridge3D} we can see the ridge surface
+  lying in the volume at its maximum.}
 \end{figure}
 
 The focus of this work is the extraction of ridge features from
@@ -662,15 +663,15 @@ $1$-dimensional function $f(x) = -x^2$ would be the $0$-dimensional
 point at $x=0$, the ridge point (Figure~\ref{fig:ridge1D}). When we add
 a dimension to the function, the domain becomes a $2$-dimensional
 surface, and the ridge point expands into a $1$-dimensional ridge line
-(Figure \ref{fig:ridge2D}). Adding another dimension turns the function
+(Figure~\ref{fig:ridge2D}). Adding another dimension turns the function
 domain into a $3$-dimensional volume and the ridge into a 2-dimensional
 surface (Figure~\ref{fig:ridge3D}) and so on. In general, a ridge is a
-$k$-dimensional manifold in an $n$-dimensional space for $k=\{,
+$k$-dimensional manifold in an $n$-dimensional space for $k=\{1,
 \dots, n-1\}$. In other words, ridge points and lines also exist in
 $3$-dimensional domains for example. This work focuses on ridges in $2$
 and $3$-dimensional domains.\\
 \indent To calculate the maximum, we need to derive the function and
-search for the points where the derived function is $0$. The derived
+search for the points where the derived function is zero. The derived
 function $f'(x)=-2x$ has only one point for which the function equals
 zero at $x=0$. Now we only know that we have found a local extremum and
 need to check whether its a maximum or minimum by looking at the second
@@ -685,7 +686,6 @@ other eigenvectors. Due to the higher dimensionality and therefore
 increasing complexity, ridges usually won't be aligned with the base
 axes of the scalar field and the dimension along which the maximum lies
 is unclear.\\
-
 \begin{figure}
   \centering
   \includegraphics[width=0.5\textwidth]{Images/ridgeEV.pdf}
@@ -695,9 +695,8 @@ is unclear.\\
   corresponding to the blue eigenvector has to be negative.}
   \label{fig:ridgeEV}
 \end{figure}
-
-The eigenvectors of the Hessian matrix give us information about the
-change of the gradient along their directions. The eigenvectors
+The eigenvectors of the Hessian matrix give us information about
+the change of the gradient along their directions. The eigenvectors
 represent the axis along which the gradient changes the most. In the
 2-dimensional case, we have two eigenvectors with which we can predict
 the change of the gradient in every possible direction. Now the dot
@@ -744,7 +743,7 @@ definition for the existence of a $k$ dimensional ridge at point $x
   \nabla S(x) \cdot \epsilon_1 = \cdots = \nabla S(x) \cdot \epsilon_{n-k} = 0
 \end{equation}
 \begin{equation}\label{eq:ridgeEV}
-  \lambda_{n-k} < 0
+  \lambda_{n-k} < 0.
 \end{equation}
 
 \noindent This is just an approximation, as ridges for example can have

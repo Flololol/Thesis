@@ -1,0 +1,43 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Conclusion}\label{chap:Discu}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+This thesis took the idea of uncertain vortex core line detection and
+transferred it to ridges in uncertain scalar fields. We deeply discussed
+the adjustments to the considered neighborhood to achieve Gaussian
+distributed derivatives and how the different approaches for the
+generation of samples from the uncertain fields influence the results.\\
+\indent While ridge lines in three dimensions almost directly follow the
+work of Otto and Theisel, ridges of co-dimension one needed some
+adjustments. As the conservative approach to extract the uncertain
+ridges with a modification of the Marching Cubes algorithm yielded
+problems at the locations where the ridge feature was weak already, we
+made use of the information that eigenvectors give us about their
+gradients, to develop a criterion that estimates the existence of a
+ridge, rather than strictly calculating it. Essentially, the criterion
+approximates the transformation of the gradient along the direction
+perpendicular to a ridge with the directional derivatives denoted by the
+eigenvalues, to estimate if the gradient in some distance $d$ flipped
+its direction and therefore passed a ridge. This gave really smooth
+results without undesired features, but with the downside of losing
+precision, especially for mostly certain sets. There are a lot of
+different ways to obtain the ridges, but the optimal parameters for the
+extraction depend on the uncertainty of the data set, making general
+recommendations difficult.\\
+\indent For the future, a point wise implementation of the new criterion
+should definitely be considered, as the criterion is independent of
+neighboring nodes. This would only be more congruent with the overall
+mechanism of the criterion. Furthermore this would challenge the
+aliasing problem, occuring if the ridge is not aligned with an axis of
+the grid, as well as reducing the arithmetical effort. For the
+3-dimensional case, this would decrease the size of the covariance
+matrix from $80 \times 80$ to $25 \times 25$ dimensional, boosting the
+computation time and challenging the issues with the numerical stability
+of either decomposition. Also, a filter should be implemented, that
+changes the type of extracted feature, depending on their relevance at
+the location. This is possible based on the eigenvalues, even together
+with a point wise extraction and would further improove the results.\\
+\indent The methods described in this work were implemented for discrete
+scalar fields of identical resolution as a plugin for ParaView. With
+this plugin, we produced our results we used to evaluate and compare
+the different approaches.

@@ -4,7 +4,7 @@
 
 \begin{figure}[ht]
     \centering
-    \includegraphics[width=0.75\textwidth]{Images/vcores.png}
+    \includegraphics[trim= 0 170 0 0, clip=true, width=0.75\textwidth]{Images/vcores.png}
     \caption{Spaghetti plot of 30 vortex core lines from a set of flow
     fields. The lines have a similar origin at the bottom of the image,
     but then deviate upwards with increasing differences. The quantity
@@ -12,14 +12,15 @@
     not distinguishable.}
     \label{fig:spaghetti}
 \end{figure}
-The graphical depiction of uncertainty has for a long time been a field
-of visualization, which has not been receiving a lot of attention. But,
-with todays available computing power, not only the amount of data
-increased, but also the ways in which the data can be aquired. With data
-more often coming from simuilations or multiple calculations with
-varying parameters, the visualization of uncertainty is of rising
-importance. Multiple flows through the same system used to be modeled
-with spaghetti plots, yielding a line for each member. Figure
+
+\noindent The graphical depiction of uncertainty has for a long time
+been a field of visualization, which has not been receiving a lot of
+attention. But, with todays available computing power, not only the
+amount of data increased, but also the ways in which the data can be
+aquired. With data more often coming from simuilations or multiple
+calculations with varying parameters, the visualization of uncertainty
+is of rising importance. Multiple flows through the same system used to
+be modeled with spaghetti plots, yielding a line for each member. Figure
 \ref{fig:spaghetti} shows a spaghetti plot of the vortex core lines of
 members of an uncertain vector domain. A vortex is a region in which the
 flow revolves around a line, the core line. The vortices of these fields
