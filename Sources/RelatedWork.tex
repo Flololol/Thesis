@@ -2,4 +2,28 @@
 \chapter{Related Work}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Related Work!
+For a long time, not a lot of work has been published in the field of
+uncertainty visualization, that tries to incorporate the level of error,
+accuracy or confidence into the representation. This was until 2011 Hege
+\etal{\cite{PMC}} introduced Probabilistic Marching Cubes, as a way to
+model the level crossing probability of isovalues for a cell in an
+uncertain scalar field. Their results were the probability for the
+occurence of Marching Cube cases in random field realizations.\\
+\indent In the following year, Hege \etal\ presented their approach for
+probabilistic local features in uncertain vector fields~\cite{PLF},
+extending the extraction of features from crisp vector fields to
+uncertain fields using Monte-Carlo integration. Also in 2012, Holger
+Theisel and Mathias Otto published an approach for the analysis of
+vortex regions in uncertain vector fields, combining the Parallel
+Vectors Operator~\cite{PV} with a Monte-Carlo sampling of a cell from
+the uncertain fields together with its neighborhood. They obtained
+volume renderings for the probabilities of the existence of a vortex
+core line or region in a field.\\
+\indent In this year, closely to the end of this work, Theisel \etal\
+published the Approximate Parallel Vectors Operator~\cite{APV}. With
+this, they expanded their method from 2012 to regions where the velocity
+field was maximally parallel to its acceleration field, instead of
+exactly parallel. This was necessary, as structures where all field are
+parallel are unstable with uncertainty, hindering exact calculation. The
+problem of certain uncertainty extraction will be a part of this work
+too.\\

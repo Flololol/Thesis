@@ -14,6 +14,7 @@ scalar fields are traversed from bottom left to top right. Sampling
 these 8 nodes with a Monte-Carlo method would only give us Gaussian
 distributed values over the range of values at these locations, but no
 information about their change along the dimensions outside the cell.\\
+
 \begin{figure}[t]
     \centering
     \begin{subfigure}{0.49\textwidth}
@@ -57,7 +58,7 @@ individually, they solved this issue by sampling the whole neighborhood
 of the vector to keep track of its change along the dimensions.
 Therefore we also inspect the 24 nodes adjacent to the 8 nodes of the
 cell, to be able to calculate the gradient via central differences. As
-Theisel \etal{} were searching for vortex core lines in uncertain vector
+Theisel \etal\ were searching for vortex core lines in uncertain vector
 fields, they only needed to derive their field once, to be able to
 decide on the presence of a core line based on the eigenspace. As we
 base our detections on eigenvalues and eigenvectors as well, we need to
@@ -151,12 +152,12 @@ location.
 For any ridge, the sampled vector gets split and its values get assigned
 to their location in the original field. With them, we estimate our
 uncertain gradients, as well as the Hessians of the cell nodes. With
-this data, we could use the Parallel Vectors operator to find the points
+this data, we could use the Parallel Vectors Operator to find the points
 in the cell, where the gradient is parallel to its minor eigenvector. If
 now the respective eigenvalue is negative, we have found a point on a
 ridge line and, if two cell faces have such a point, the sample is
 considered to contain a ridge. This would directly follow the work of
-Theisel \etal{} and therefore we will not go too much into detail. See
+Theisel \etal\ and therefore we will not go too much into detail. See
 Chapter~\ref{chap:Eval} for results of the uncertain ridge line
 calculation in 3 dimensions.\\
 \begin{figure}[ht]
@@ -401,7 +402,7 @@ in theory, $d$ can be adjusted to estimate over larger distances. We
 apply Equation~\ref{eq:criterion} to every node of our sampled cell and
 the probability for the existence of a ridge line inside this cell is
 then the relative frequency of nodes for which the equation states true,
-e.g.\, if it is true for 4 out of 8 nodes, the probability is $50\%$.
+e.g., if it is true for 4 out of 8 nodes, the probability is $50\%$.
 The probability for each sample is summed up and divided by the total
 number of samples to get the final probability for the existence of a
 ridge in that cell.\\
@@ -456,7 +457,7 @@ largest eigenvalue to the largest eigenvalue. The PCA filter therefore
 discards cells where the second largest eigenvalue is greater than a
 given percentage of the largest eigenvalue of the PCA subdomain. Both
 these filters are also applicable for the conservative ridge extraction
-with Uncertain Marching Cubes and the Parallel Vectors operator, with
+with Uncertain Marching Cubes and the Parallel Vectors Operator, with
 the eigenvalues and vectors at the interpolated point between the nodes.
 With our methods explained in detail, we can now start to evaluate the
 results obtained from different data sets.

@@ -777,7 +777,7 @@ of possible ridge features. With different algorithms we can still try
 to estimate the ridge as best as possible. For the certain extraction of
 ridge surfaces in 3D and ridge lines in 2D, an approach using the
 Marching Cubes algorithm is the usual way to approximate the ridge. For
-ridge lines in 3D, the Parallel Vectors operator is used to find the
+ridge lines in 3D, the Parallel Vectors Operator is used to find the
 ridges. We will explain both and how we use them in our uncertain
 context.
 
@@ -840,7 +840,7 @@ extract two isovalues simultaneously for the orthogonality. For the
 orthogonal to two eigenvectors implies parallelity to the third.
 Therefore we only need to search for the points where the gradient is
 parallel to its major eigenvector, $g||\epsilon_3$. Peikert and Roth
-proposed the Parallel Vectors operator~\cite{PV} as a versatile tool to
+proposed the Parallel Vectors Operator~\cite{PV} as a versatile tool to
 find the set of points where two vector fields are parallel. We will use
 their analytic solution for triangular faces, and therefore every face
 of a cell is split into two triangles. The vectors of the gradient field

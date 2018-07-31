@@ -47,7 +47,7 @@ their approach for extracting probabilities for the existence of a
 vortex core line in a cell. They were the first to expand the
 multivariate Gaussian sampling to a neighborhood of a vector field,
 giving them normally distributed derivatives. This allowed them to
-process their sampled cells using the Parallel Vectors operator, to find
+process their sampled cells using the Parallel Vectors Operator, to find
 the points at which the velocity vector is parallel to its derived
 acceleration vector. If now the Jacobian matrix at the found point has a
 pair of complex conjugate eigenvalues, the point lies on a vortex.
@@ -67,7 +67,7 @@ features from uncertain scalar fields. For the extraction of a ridge
 line from an 3-dimensional scalar field, the approach is basically the
 same. We only require an extra step, calculating the gradient of the
 sampled scalar field, to get an uncertain vector field in which we can
-search for similar criteria. The Parallel Vectors operator is easily
+search for similar criteria. The Parallel Vectors Operator is easily
 adjusted to give the points where the gradient is parallel to its major
 eigenvector and the eigenvalues of the Hessian, the counterpart to the
 Jacobian, don't need to be complex, but negative. The extraction of a

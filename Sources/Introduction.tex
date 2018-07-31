@@ -2,4 +2,40 @@
 \chapter{Introduction}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Fancy Introduction.
+For the analysis of scalar or vector fields, the extraction of features
+enables the deeper understanding of the domains. With today's wide
+range of possibilities of gaining data, feature extraction has become an
+important field of research in scientific visualization. Using the
+available computing power, simulations increasingly become the method of
+choice to understand a problem or behaviour of a system. These simulations,
+run with varying parameters to cover multiple scenarios, produce a lot
+of data, that needs to be further processed. As the data usually is very
+similar with only slight changes due to the parameters, individual
+examination is inpractical and does not deliver an understanding of the
+overall distribution of the data.\\
+\indent Ridges are used in a variety of scenarios, like medical or flow
+visualizations. They denote the points, where the scalar fields are
+locally maximal and therefore play a vital role for the comprehension of
+the data. With modern graphics cards, simulations of complex flow
+systems can be run on affordable hardware, without the need for larger
+computing servers, increasing the amount of data massively. This brings
+up the need for a simultaneous analysis of the distribution of ridges in
+an uncertain scalar field, obtained, for example, from the members of
+an simulation ensemble.\\
+\indent We will create multivariate Gaussian distributions from the
+fields we examine and use Monte-Carlo methods to sample these
+distributions. With the samples, we can compute ridge criteria for a
+local area of the uncertain field. As the extraction of ridges in a
+certain setting already yields some problems with false positives, we
+use the information that eigenvectors give us about the underlying
+system, to develop a new criterion for ridges of co-dimension one, that
+estimates the existence of a ridge in a small distance, rather than
+strictly calculating it.\\
+\indent In this work, we will explain the problems occuring with
+sampling multivariate Gaussian distributions, when using a strict
+approach for the extraction of ridges. Further, we implemented our
+method as a plugin for the data analysis and visualization tool
+ParaView, together with the conservative approaches for obtaining ridges
+in 2 and 3D. At the end, we will deeply discuss the differences coming
+from the multitude of possibilities for the calculation of the ridge
+features.
